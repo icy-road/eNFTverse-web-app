@@ -7,14 +7,14 @@ import Page from '../components/Page';
 
 // ----------------------------------------------------------------------
 
-export default function PageThree() {
+export default function Dashboard() {
   const { themeStretch } = useSettings();
 
   return (
-    <Page title="Page Three">
+    <Page title="Dashboard">
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <Typography variant="h3" component="h1" paragraph>
-          Page Three
+          Page One
         </Typography>
         <Typography gutterBottom>
           Curabitur turpis. Vestibulum facilisis, purus nec pulvinar iaculis, ligula mi congue nunc,

@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // @mui
 import { alpha } from '@mui/material/styles';
-import { Box, Divider, MenuItem, Typography, Stack, Avatar } from '@mui/material';
+import { Box, Divider, MenuItem, Typography, Stack, Avatar, Button } from '@mui/material';
 // components
 import MenuPopover from '../../../components/MenuPopover';
 import { IconButtonAnimate } from '../../../components/animate';
@@ -22,6 +22,7 @@ export default function AccountPopover() {
   const anchorRef = useRef(null);
 
   const [open, setOpen] = useState(false);
+  const [walletConnected, setWalletConnected] = useState(false);
 
   const handleOpen = () => {
     setOpen(true);
@@ -30,34 +31,44 @@ export default function AccountPopover() {
     setOpen(false);
   };
 
+  const handleConnectWallet = () => {
+    setWalletConnected(true);
+  };
+
+  const handleDisconnectWallet = () => {
+    setWalletConnected(false);
+  };
+
   return (
     <>
-      <IconButtonAnimate
-        ref={anchorRef}
-        onClick={handleOpen}
-        sx={{
-          padding: 0,
-          width: 44,
-          height: 44,
-          ...(open && {
-            '&:before': {
-              zIndex: 1,
-              content: "''",
-              width: '100%',
-              height: '100%',
-              borderRadius: '50%',
-              position: 'absolute',
-              bgcolor: (theme) => alpha(theme.palette.grey[900], 0.8),
-            },
-          }),
-        }}
-      >
-        <Avatar
-          src="https://minimal-assets-api.vercel.app/assets/images/avatars/avatar_5.jpg"
-          alt="Rayan Moran"
-        />
-      </IconButtonAnimate>
-
+      {walletConnected ? (
+        <IconButtonAnimate
+          ref={anchorRef}
+          onClick={handleOpen}
+          sx={{
+            padding: 0,
+            width: 120,
+            ...(open && {
+              '&:before': {
+                zIndex: 1,
+                content: "''",
+                width: '100%',
+                height: '100%',
+                borderRadius: '50%',
+                position: 'absolute',
+              },
+            }),
+          }}
+        >
+          <Button variant="contained" color="primary">
+            <Typography noWrap>0xCC07e9C9C79caae41306C94E1b597B9712c86FF7</Typography>
+          </Button>
+        </IconButtonAnimate>
+      ) : (
+        <Button variant="contained" color="secondary" onClick={handleConnectWallet}>
+          Connect Wallet
+        </Button>
+      )}
       <MenuPopover
         open={open}
         onClose={handleClose}
@@ -79,7 +90,10 @@ export default function AccountPopover() {
         </Stack>
         <Divider />
 
-        <MenuItem sx={{ typography: 'body2', py: 1, px: 2, borderRadius: 1, m: 1 }}>
+        <MenuItem sx={{ typography: 'body2', py: 1, px: 2, borderRadius: 1, m: 1 }} onClick={() => {
+            handleClose()
+            handleDisconnectWallet()
+        }}>
           Disconnect
         </MenuItem>
       </MenuPopover>

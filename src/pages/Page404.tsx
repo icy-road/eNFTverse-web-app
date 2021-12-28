@@ -41,8 +41,8 @@ export default function Page404() {
               <PageNotFoundIllustration sx={{ height: 260, my: { xs: 5, sm: 10 } }} />
             </m.div>
 
-            <Button to="/" size="large" variant="contained" component={RouterLink}>
-              Go to Home
+            <Button to="/marketplace" size="large" variant="contained" component={RouterLink}>
+              Go to Marketplace
             </Button>
           </Box>
         </Container>

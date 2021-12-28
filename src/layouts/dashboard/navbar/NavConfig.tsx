@@ -20,8 +20,7 @@ const sidebarConfig = [
   {
     subheader: '',
     items: [
-      { title: 'Dashboard', path: '/dashboard/one', icon: ICONS.dashboard },
-      { title: 'Store', path: '/dashboard/two', icon: ICONS.ecommerce },
+      { title: 'Marketplace', path: '/marketplace', icon: ICONS.ecommerce },
     ],
   },
 ];
