@@ -9,7 +9,8 @@ import {Product} from "../@types/product";
 
 export const sampleProducts: Product[] = [
   {
-    id: '12341412',
+    nftId: '0',
+    contractAddress: '0x94667a5A3042f3369033F9476bFf9A0E51f361d7',
     image: 'https://minimal-assets-api.vercel.app/assets/images/products/product_1.jpg',
     name: 'NFT_NAME_1',
     priceSale: 20.00,
@@ -20,7 +21,8 @@ export const sampleProducts: Product[] = [
     category: 'Art'
   },
   {
-    id: '12341413',
+    nftId: '12341413',
+    contractAddress: '0x94667a5A3042f3369033F9476bFf9A0E51f361d7',
     image: 'https://minimal-assets-api.vercel.app/assets/images/products/product_2.jpg',
     name: 'NFT_NAME_2',
     price: 32,
@@ -31,7 +33,8 @@ export const sampleProducts: Product[] = [
     category: 'Art'
   },
   {
-    id: '12341414',
+    nftId: '12341414',
+    contractAddress: '0x94667a5A3042f3369033F9476bFf9A0E51f361d7',
     image: 'https://minimal-assets-api.vercel.app/assets/images/products/product_3.jpg',
     name: 'NFT_NAME_3',
     price: 100,
@@ -42,7 +45,8 @@ export const sampleProducts: Product[] = [
     category: 'Art'
   },
   {
-    id: '12341415',
+    nftId: '12341415',
+    contractAddress: '0x94667a5A3042f3369033F9476bFf9A0E51f361d7',
     image: 'https://minimal-assets-api.vercel.app/assets/images/products/product_4.jpg',
     name: 'NFT_NAME_5',
     price: 35,
@@ -53,7 +57,8 @@ export const sampleProducts: Product[] = [
     category: 'Art'
   },
   {
-    id: '12341416',
+    nftId: '12341416',
+    contractAddress: '0x94667a5A3042f3369033F9476bFf9A0E51f361d7',
     image: 'https://minimal-assets-api.vercel.app/assets/images/products/product_5.jpg',
     name: 'NFT_NAME_6',
     price: 35,
@@ -64,7 +69,8 @@ export const sampleProducts: Product[] = [
     category: 'Art'
   },
   {
-    id: '12341417',
+    nftId: '12341417',
+    contractAddress: '0x94667a5A3042f3369033F9476bFf9A0E51f361d7',
     image: 'https://minimal-assets-api.vercel.app/assets/images/products/product_6.jpg',
     name: 'NFT_NAME_7',
     price: 35,

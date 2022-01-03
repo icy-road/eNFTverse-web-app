@@ -1,26 +1,11 @@
-import { useNavigate } from 'react-router-dom';
 import { useFormik, Form, FormikProvider, useField } from 'formik';
-import { useTheme, styled } from '@mui/material/styles';
-import {
-  Box,
-  Grid,
-  Stack,
-  Button,
-  Divider,
-  IconButton,
-  Typography,
-  Card,
-  Tab,
-} from '@mui/material';
-import { fCurrency } from '../../../../utils/formatNumber';
+import { styled } from '@mui/material/styles';
+import { Box, Grid, Button, Divider, IconButton, Typography, Card, Tab, Link } from '@mui/material';
 import { Product } from '../../../../@types/product';
 import Iconify from '../../../../components/Iconify';
 import React from 'react';
 import Markdown from '../../../../components/Markdown';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
-import Image from '../../../../components/Image';
-
-// ----------------------------------------------------------------------
 
 const RootStyle = styled('div')(({ theme }) => ({
   padding: theme.spacing(3),
@@ -36,12 +21,12 @@ type Props = {
 };
 
 export default function ProductDetailsSummary({ product, ...other }: Props) {
-  const { id, name, price, status, priceSale } = product;
+  const { nftId, name, price, status, priceSale } = product;
 
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      id,
+      nftId,
       name,
       price,
     },
@@ -84,9 +69,6 @@ export default function ProductDetailsSummary({ product, ...other }: Props) {
           </Typography>
 
           <Typography variant="h4" sx={{ mb: 3 }}>
-            <Box component="span" sx={{ color: 'text.disabled', textDecoration: 'line-through' }}>
-              {priceSale && priceSale + ' CRO'}
-            </Box>
             &nbsp;{price + ' CRO'}
           </Typography>
 
@@ -113,18 +95,45 @@ export default function ProductDetailsSummary({ product, ...other }: Props) {
                 </TabList>
               </Box>
               <TabPanel value="1">
-                <Box sx={{ p: 3 }}>
-
-                <Grid container justifyContent={'space-between'}>
-                  <Grid item xs={12} md={6} lg={12}>
-                    <Typography  paragraph>
-                      Contract Address
-                    </Typography>
+                <Box sx={{ p: 3, pb: 1 }}>
+                  <Grid container spacing={2} justifyContent={'space-between'}>
+                    <Grid item xs={8}>
+                      <Typography paragraph>Contract Address</Typography>
+                    </Grid>
+                    <Grid item xs={4} display={'flex'} justifyContent={'flex-end'}>
+                      <Link
+                        href={`https://cronos.crypto.org/explorer/testnet3/tokens/${product.contractAddress}/token-transfers`}
+                        noWrap
+                        target="_blank"
+                        align="right"
+                      >
+                        {product.contractAddress}
+                      </Link>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12} md={6} lg={7}>
-                    ds
+                  <Grid container spacing={2} justifyContent={'space-between'}>
+                    <Grid item xs={8}>
+                      <Typography paragraph>NFT Address</Typography>
+                    </Grid>
+                    <Grid item xs={4} display={'flex'} justifyContent={'flex-end'}>
+                      <Link
+                        href={`https://cronos.crypto.org/explorer/testnet3/tokens/${product.contractAddress}/instance/${product.nftId}/token-transfers`}
+                        noWrap
+                        target="_blank"
+                        align="right"
+                      >
+                        {product.nftId}
+                      </Link>
+                    </Grid>
                   </Grid>
-                </Grid>
+                  <Grid container spacing={2} justifyContent={'space-between'}>
+                    <Grid item xs={8}>
+                      <Typography paragraph>Token Standard</Typography>
+                    </Grid>
+                    <Grid item xs={4} display={'flex'} justifyContent={'flex-end'}>
+                      <Typography variant="body2">ERC-721</Typography>
+                    </Grid>
+                  </Grid>
                 </Box>
               </TabPanel>
             </TabContext>

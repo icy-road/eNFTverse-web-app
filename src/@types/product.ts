@@ -3,7 +3,8 @@ export type ProductStatus = 'sale' | 'new' | '';
 export type ProductCategory = 'Art';
 
 export type Product = {
-  id: string;
+  nftId: string;
+  contractAddress: string;
   image: string;
   name: string;
   price: number;
