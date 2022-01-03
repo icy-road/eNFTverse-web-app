@@ -6,6 +6,7 @@ import { Box, Divider, MenuItem, Typography, Stack, Avatar, Button } from '@mui/
 // components
 import MenuPopover from '../../../components/MenuPopover';
 import { IconButtonAnimate } from '../../../components/animate';
+import useWallet from '../../../hooks/useWallet';
 
 // ----------------------------------------------------------------------
 
@@ -21,8 +22,9 @@ const MENU_OPTIONS = [
 export default function AccountPopover() {
   const anchorRef = useRef(null);
 
-  const [open, setOpen] = useState(false);
-  const [walletConnected, setWalletConnected] = useState(false);
+  const { walletConnected, connectWallet, disconnectWallet } = useWallet();
+
+  const [open, setOpen] = useState(walletConnected);
 
   const handleOpen = () => {
     setOpen(true);
@@ -32,11 +34,11 @@ export default function AccountPopover() {
   };
 
   const handleConnectWallet = () => {
-    setWalletConnected(true);
+    connectWallet();
   };
 
   const handleDisconnectWallet = () => {
-    setWalletConnected(false);
+    disconnectWallet();
   };
 
   return (
@@ -75,25 +77,28 @@ export default function AccountPopover() {
         anchorEl={anchorRef.current}
         sx={{ width: 220 }}
       >
-        <Stack spacing={0.5} sx={{ p: 1 }}>
+        {/*<Stack spacing={0.5} sx={{p: 1}}>
           {MENU_OPTIONS.map((option) => (
-            <MenuItem
-              key={option.label}
-              to={option.linkTo}
-              component={RouterLink}
-              onClick={handleClose}
-              sx={{ typography: 'body2', py: 1, px: 2, borderRadius: 1 }}
-            >
-              {option.label}
-            </MenuItem>
+              <MenuItem
+                  key={option.label}
+                  to={option.linkTo}
+                  component={RouterLink}
+                  onClick={handleClose}
+                  sx={{typography: 'body2', py: 1, px: 2, borderRadius: 1}}
+              >
+                {option.label}
+              </MenuItem>
           ))}
         </Stack>
-        <Divider />
+          <Divider />*/}
 
-        <MenuItem sx={{ typography: 'body2', py: 1, px: 2, borderRadius: 1, m: 1 }} onClick={() => {
-            handleClose()
-            handleDisconnectWallet()
-        }}>
+        <MenuItem
+          sx={{ typography: 'body2', py: 1, px: 2, borderRadius: 1, m: 1 }}
+          onClick={() => {
+            handleClose();
+            handleDisconnectWallet();
+          }}
+        >
           Disconnect
         </MenuItem>
       </MenuPopover>

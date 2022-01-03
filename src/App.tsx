@@ -10,6 +10,7 @@ import ScrollToTop from './components/ScrollToTop';
 import { ProgressBarStyle } from './components/ProgressBar';
 import ThemeColorPresets from './components/ThemeColorPresets';
 import MotionLazyContainer from './components/animate/MotionLazyContainer';
+import { WalletContextProvider } from './contexts/wallet/WalletContext';
 
 // ----------------------------------------------------------------------
 
@@ -19,10 +20,12 @@ export default function App() {
       <ThemeColorPresets>
         <RtlLayout>
           <MotionLazyContainer>
-            <GlobalStyles />
-            <ProgressBarStyle />
-            <ScrollToTop />
-            <Router />
+            <WalletContextProvider>
+              <GlobalStyles />
+              <ProgressBarStyle />
+              <ScrollToTop />
+              <Router />
+            </WalletContextProvider>
           </MotionLazyContainer>
         </RtlLayout>
       </ThemeColorPresets>
