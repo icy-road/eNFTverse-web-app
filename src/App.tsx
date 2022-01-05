@@ -11,8 +11,16 @@ import { ProgressBarStyle } from './components/ProgressBar';
 import ThemeColorPresets from './components/ThemeColorPresets';
 import MotionLazyContainer from './components/animate/MotionLazyContainer';
 import { WalletContextProvider } from './contexts/wallet/WalletContext';
+import {Web3Provider} from "@ethersproject/providers";
+import {Web3ReactProvider} from "@web3-react/core";
 
 // ----------------------------------------------------------------------
+
+function getLibrary(provider: any) {
+  const library = new Web3Provider(provider);
+  library.pollingInterval = 12000;
+  return library;
+}
 
 export default function App() {
   return (
@@ -20,12 +28,12 @@ export default function App() {
       <ThemeColorPresets>
         <RtlLayout>
           <MotionLazyContainer>
-            <WalletContextProvider>
+            <Web3ReactProvider getLibrary={getLibrary}>
               <GlobalStyles />
               <ProgressBarStyle />
               <ScrollToTop />
               <Router />
-            </WalletContextProvider>
+            </Web3ReactProvider>
           </MotionLazyContainer>
         </RtlLayout>
       </ThemeColorPresets>
