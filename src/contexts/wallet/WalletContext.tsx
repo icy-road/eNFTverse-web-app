@@ -1,5 +1,6 @@
 import { Wallet } from '../../@types/wallet';
 import { createContext, ReactNode, useState } from 'react';
+import { useWeb3React } from "@web3-react/core";
 
 export type WalletContextProps = {
   walletConnected: boolean;
@@ -22,9 +23,14 @@ type WalletProviderProps = {
 function WalletContextProvider({ children }: WalletProviderProps) {
   const [wallet, setWallet] = useState<Wallet>();
 
+  const { active, error, activate, chainId, account, setError } =
+      useWeb3React();
+  console.log({ active, error, activate, chainId, account, setError })
+
   const connectWallet = () => {
     //TODO: CONNECT WALLET then setWallet(connectedWallet);
-    setWallet({});
+    console.log('connect wallet')
+    // setWallet({ walletConnected: true, connectedAddress: account, web3: library});
   };
 
   const disconnectWallet = () => {
