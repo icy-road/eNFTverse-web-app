@@ -1,89 +1,58 @@
-import React from "react";
+import React, {useEffect, useState} from 'react';
 
 import { Container, Typography } from '@mui/material';
 import useSettings from '../hooks/useSettings';
 import Page from '../components/Page';
 
-import { ShopProductList } from '../sections/@dashboard/e-commerce/shop';
-import {Product} from "../@types/product";
 
-export const sampleProducts: Product[] = [
-  {
-    nftId: '0',
-    contractAddress: '0x94667a5A3042f3369033F9476bFf9A0E51f361d7',
-    image: 'https://minimal-assets-api.vercel.app/assets/images/products/product_1.jpg',
-    name: 'NFT_NAME_1',
-    priceSale: 20.00,
-    price: 16.19,
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sapien sapien, ornare id semper et, gravida a nunc.',
-    status: "sale",
-    createdAt: '2021-12-21T10:13:54.053Z',
-    category: 'Art'
-  },
-  {
-    nftId: '12341413',
-    contractAddress: '0x94667a5A3042f3369033F9476bFf9A0E51f361d7',
-    image: 'https://minimal-assets-api.vercel.app/assets/images/products/product_2.jpg',
-    name: 'NFT_NAME_2',
-    price: 32,
-    priceSale: null,
-    description: 'Some fancy description',
-    status: "sale",
-    createdAt: '2021-12-21T10:13:54.053Z',
-    category: 'Art'
-  },
-  {
-    nftId: '12341414',
-    contractAddress: '0x94667a5A3042f3369033F9476bFf9A0E51f361d7',
-    image: 'https://minimal-assets-api.vercel.app/assets/images/products/product_3.jpg',
-    name: 'NFT_NAME_3',
-    price: 100,
-    priceSale: null,
-    description: 'Some fancy description',
-    status: "sale",
-    createdAt: '2021-12-21T10:13:54.053Z',
-    category: 'Art'
-  },
-  {
-    nftId: '12341415',
-    contractAddress: '0x94667a5A3042f3369033F9476bFf9A0E51f361d7',
-    image: 'https://minimal-assets-api.vercel.app/assets/images/products/product_4.jpg',
-    name: 'NFT_NAME_5',
-    price: 35,
-    priceSale: null,
-    description: 'Some fancy description',
-    status: "sale",
-    createdAt: '2021-12-21T10:13:54.053Z',
-    category: 'Art'
-  },
-  {
-    nftId: '12341416',
-    contractAddress: '0x94667a5A3042f3369033F9476bFf9A0E51f361d7',
-    image: 'https://minimal-assets-api.vercel.app/assets/images/products/product_5.jpg',
-    name: 'NFT_NAME_6',
-    price: 35,
-    priceSale: null,
-    description: 'Some fancy description',
-    status: "sale",
-    createdAt: '2021-12-21T10:13:54.053Z',
-    category: 'Art'
-  },
-  {
-    nftId: '12341417',
-    contractAddress: '0x94667a5A3042f3369033F9476bFf9A0E51f361d7',
-    image: 'https://minimal-assets-api.vercel.app/assets/images/products/product_6.jpg',
-    name: 'NFT_NAME_7',
-    price: 35,
-    priceSale: null,
-    description: 'Some fancy description',
-    status: "sale",
-    createdAt: '2021-12-21T10:13:54.053Z',
-    category: 'Art'
-  }
-]
+import { ShopProductList } from '../sections/@dashboard/e-commerce/shop';
+import { Product } from '../@types/product';
+import Web3 from 'web3';
+
+const nftContractABI = require('../utils/NFTContract.json');
+const superagent = require('superagent');
 
 export default function Marketplace() {
   const { themeStretch } = useSettings();
+
+  const [products, setProducts] = useState<Product[]>([])
+
+  useEffect(() => {
+    fetchNfts();
+  }, []);
+
+  async function fetchNfts() {
+    const web3 = new Web3('https://cronos-testnet-3.crypto.org:8545');
+    const nftContract = new web3.eth.Contract(
+        nftContractABI,
+        '0x94667a5A3042f3369033F9476bFf9A0E51f361d7'
+    );
+
+    const totalSupply = await nftContract.methods.totalSupply().call();
+
+    const newProducts : Product[] = []
+
+    for (let i = 0; i < totalSupply; i++) {
+      const tokenMetadataUri = await nftContract.methods.tokenURI(i).call();
+      const nftMetadata : any = (await superagent.get(tokenMetadataUri)).body
+
+      newProducts.push({
+        nftId: i.toString(),
+        contractAddress: '0x94667a5A3042f3369033F9476bFf9A0E51f361d7',
+        image: nftMetadata.image,
+        name: nftMetadata.name,
+        price: 1000,
+        priceSale: null,
+        description: nftMetadata.description,
+        status: 'sale',
+        category: "Art"
+      })
+
+    }
+
+    setProducts(newProducts)
+  }
+
 
   return (
     <Page title="Marketplace">
@@ -91,7 +60,7 @@ export default function Marketplace() {
         <Typography variant="h3" component="h1" paragraph>
           Marketplace
         </Typography>
-        <ShopProductList isDefault={true} products={sampleProducts} />
+        <ShopProductList isDefault={true} products={products} />
       </Container>
     </Page>
   );

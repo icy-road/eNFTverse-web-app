@@ -1,37 +1,21 @@
 import React, { useEffect, useState } from 'react';
 
-import { sentenceCase } from 'change-case';
 import { useParams } from 'react-router-dom';
 
-import { alpha, styled } from '@mui/material/styles';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
 import useSettings from '../hooks/useSettings';
 import Page from '../components/Page';
-import { Box, Card, Container, Divider, Grid, Tab, Typography } from '@mui/material';
+import { Box, Card, Container, Grid, Typography } from '@mui/material';
 import SkeletonNft from '../components/skeleton/SkeletonNft';
-import { sampleProducts } from './Marketplace';
-import Iconify from '../components/Iconify';
 import Image from '../components/Image';
 import ProductDetailsSummary from 'src/sections/@dashboard/e-commerce/product/ProductDetailsSummary';
+import {Product} from "../@types/product";
 
-const IconWrapperStyle = styled('div')(({ theme }) => ({
-  margin: 'auto',
-  display: 'flex',
-  borderRadius: '50%',
-  alignItems: 'center',
-  width: theme.spacing(8),
-  justifyContent: 'center',
-  height: theme.spacing(8),
-  marginBottom: theme.spacing(3),
-  color: theme.palette.primary.main,
-  backgroundColor: `${alpha(theme.palette.primary.main, 0.08)}`,
-}));
 
 export default function NFTDetails() {
   const { themeStretch } = useSettings();
   const [value, setValue] = useState('1');
   const { id = '' } = useParams();
-  const [product, setProduct] = useState(sampleProducts[0]);
+  const [product, setProduct] = useState({} as Product);
 
   return (
     <Page title="NFT Details">

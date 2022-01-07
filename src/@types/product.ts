@@ -11,6 +11,5 @@ export type Product = {
   priceSale: number | null;
   status: ProductStatus;
   description: string;
-  createdAt: Date | string | number;
   category: ProductCategory;
 };

@@ -4,13 +4,11 @@ import Router from './routes';
 import ThemeProvider from './theme';
 import GlobalStyles from './theme/globalStyles';
 // components
-import Settings from './components/settings';
 import RtlLayout from './components/RtlLayout';
 import ScrollToTop from './components/ScrollToTop';
 import { ProgressBarStyle } from './components/ProgressBar';
 import ThemeColorPresets from './components/ThemeColorPresets';
 import MotionLazyContainer from './components/animate/MotionLazyContainer';
-import { WalletContextProvider } from './contexts/wallet/WalletContext';
 import {Web3Provider} from "@ethersproject/providers";
 import {Web3ReactProvider} from "@web3-react/core";
 
