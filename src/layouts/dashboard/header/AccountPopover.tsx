@@ -1,21 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
-import { MenuItem, Typography, Stack, Avatar, Button } from '@mui/material';
-import MenuPopover from '../../../components/MenuPopover';
+import { Typography, Button } from '@mui/material';
 import { IconButtonAnimate } from '../../../components/animate';
-import { shortenHex } from '../../../hooks/useWallet';
 import { useWeb3React } from '@web3-react/core';
 import useENSName from '../../../hooks/useENSName';
 import { UserRejectedRequestError } from '@web3-react/injected-connector';
 import { injected } from '../../../connectors';
+import useMetaMaskOnboarding from "../../../hooks/useMetaMaskOnboarding";
 
-import useMetaMask from '../../../hooks/useMetaMask';
 
 export default function AccountPopover() {
   const anchorRef = useRef(null);
 
   const { active, error, activate, chainId, account, setError } = useWeb3React();
 
-  const { isMetaMaskInstalled, isWeb3Available, startOnboarding, stopOnboarding } = useMetaMask();
+  const { isMetaMaskInstalled, isWeb3Available, startOnboarding, stopOnboarding } = useMetaMaskOnboarding();
 
   const ENSName = useENSName(account);
 

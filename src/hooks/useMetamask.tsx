@@ -1,21 +1,25 @@
-import { useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
-import useMetaMaskOnboarding from './useMetaMaskOnboarding';
-import useENSName from './useENSName';
 import { UserRejectedRequestError } from '@web3-react/injected-connector';
+import { useEffect, useState } from 'react';
 import { injected } from '../connectors';
+import useENSName from './useENSName';
+import useMetaMaskOnboarding from './useMetaMaskOnboarding';
+import { GlobalContext } from '../contexts/GlobalContext';
+import {formatEtherscanLink, shortenHex} from "../utils/helper";
 
 type AccountProps = {
   triedToEagerConnect: boolean;
 };
 
-const useWallet = ({ triedToEagerConnect }: AccountProps) => {
+const useMetamask = ({ triedToEagerConnect }: AccountProps) => {
   const { active, error, activate, chainId, account, setError } = useWeb3React();
 
-  const { isMetaMaskInstalled, isWeb3Available, startOnboarding, stopOnboarding } = useMetaMaskOnboarding();
+  const { isMetaMaskInstalled, isWeb3Available, startOnboarding, stopOnboarding } =
+    useMetaMaskOnboarding();
 
+  // manage connecting state for injected connector
   const [connecting, setConnecting] = useState(false);
-
   useEffect(() => {
     if (active || error) {
       setConnecting(false);
@@ -24,6 +28,12 @@ const useWallet = ({ triedToEagerConnect }: AccountProps) => {
   }, [active, error, stopOnboarding]);
 
   const ENSName = useENSName(account);
+
+  const { metamaskAddress, setMetamaskAddress } = useContext(GlobalContext);
+
+    if (account != null) {
+        setMetamaskAddress(ENSName || account ? `${shortenHex(account, 4)}` : null);
+    }
 
   if (error) {
     return { error: null };
@@ -56,7 +66,7 @@ const useWallet = ({ triedToEagerConnect }: AccountProps) => {
   }
 
   const href = {
-    href: formatEtherscanLink('Account', [chainId ? chainId : 1, account]),
+    href: formatEtherscanLink('Account', [chainId, account]),
     target: '_blank',
     rel: 'noopener noreferrer',
   };
@@ -65,28 +75,4 @@ const useWallet = ({ triedToEagerConnect }: AccountProps) => {
   return { href, address };
 };
 
-export function shortenHex(hex: string, length = 4) {
-  return `${hex.substring(0, length + 2)}…${hex.substring(hex.length - length)}`;
-}
-
-const ETHERSCAN_PREFIXES = {
-  1: '',
-  338: 'tcro.',
-};
-
-function formatEtherscanLink(type: 'Account' | 'Transaction', data: [number, string]) {
-  switch (type) {
-    case 'Account': {
-      const [chainId, address] = data;
-      // @ts-ignore
-      return `https://${ETHERSCAN_PREFIXES[chainId]}etherscan.io/address/${address}`;
-    }
-    case 'Transaction': {
-      const [chainId, hash] = data;
-      // @ts-ignore
-      return `https://${ETHERSCAN_PREFIXES[chainId]}etherscan.io/tx/${hash}`;
-    }
-  }
-}
-
-export default useWallet;
+export default useMetamask;
