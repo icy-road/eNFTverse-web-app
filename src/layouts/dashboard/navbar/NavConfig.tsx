@@ -12,6 +12,7 @@ const ICONS = {
   ecommerce: getIcon('ic_ecommerce'),
   analytics: getIcon('ic_analytics'),
   dashboard: getIcon('ic_dashboard'),
+  search: getIcon('ic_search'),
 };
 
 const sidebarConfig = [
@@ -21,6 +22,7 @@ const sidebarConfig = [
     subheader: '',
     items: [
       { title: 'Marketplace', path: '/marketplace', icon: ICONS.ecommerce },
+      { title: 'Explore', path: '/explore-nfts', icon: ICONS.search },
     ],
   },
 ];

@@ -25,6 +25,7 @@ export default function Router() {
         { path: '/marketplace', element: <Marketplace /> },
         { path: '/', element: <Navigate to="/marketplace" replace /> },
         { path: '/marketplace/nft/:id', element: <ProductDetails /> },
+        { path: '/explore-nfts', element: <ExploreNFTs />}
       ],
     },
     {
@@ -42,4 +43,5 @@ export default function Router() {
 // Dashboard
 const Marketplace = Loadable(lazy(() => import('./pages/Marketplace')));
 const ProductDetails = Loadable(lazy(() => import('./pages/NFTDetails')));
+const ExploreNFTs = Loadable(lazy(() => import('./pages/ExploreNFTs')));
 const NotFound = Loadable(lazy(() => import('./pages/Page404')));
