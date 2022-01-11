@@ -1,24 +1,20 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-// @mui
 import { styled, useTheme } from '@mui/material/styles';
-import { Box, Stack, Drawer } from '@mui/material';
-// hooks
+import { Box, Stack, Drawer, Button } from '@mui/material';
 import useResponsive from '../../../hooks/useResponsive';
 import useCollapseDrawer from '../../../hooks/useCollapseDrawer';
-// utils
 import cssStyles from '../../../utils/cssStyles';
-// config
+
 import { DASHBOARD_NAVBAR_WIDTH, DASHBOARD_NAVBAR_COLLAPSE_WIDTH } from '../../../config';
-// components
 import Logo from '../../../components/Logo';
 import Scrollbar from '../../../components/Scrollbar';
 import NavSection from '../../../components/nav-section';
-//
-import NavbarAccount from './NavbarAccount';
-import NavbarDocs from './NavbarDocs';
-import CollapseButton from './CollapseButton';
 import navConfig from './NavConfig';
+import useMetamask from '../../../hooks/useMetamask';
+import { useWeb3React } from '@web3-react/core';
+import useENSName from '../../../hooks/useENSName';
+import useMetaMaskOnboarding from '../../../hooks/useMetaMaskOnboarding';
 
 // ----------------------------------------------------------------------
 
@@ -42,6 +38,11 @@ export default function DashboardNavbar({ isOpenSidebar, onCloseSidebar }: Props
   const theme = useTheme();
 
   const { pathname } = useLocation();
+
+  const { account } = useWeb3React();
+
+  const { isMetaMaskInstalled, isWeb3Available, startOnboarding, stopOnboarding } =
+    useMetaMaskOnboarding();
 
   const isDesktop = useResponsive('up', 'lg');
 
@@ -74,16 +75,22 @@ export default function DashboardNavbar({ isOpenSidebar, onCloseSidebar }: Props
       >
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Logo />
-
-          {isDesktop && !isCollapse && (
-            <CollapseButton onToggleCollapse={onToggleCollapse} collapseClick={collapseClick} />
-          )}
         </Stack>
       </Stack>
 
       <NavSection navConfig={navConfig} isCollapse={isCollapse} />
 
       <Box sx={{ flexGrow: 1 }} />
+
+      <Stack sx={{ m: 2, flexGrow: 1 }} justifyContent="flex-end">
+        <Button
+          disabled={!isMetaMaskInstalled || !isWeb3Available || typeof account !== 'string'}
+          variant="contained"
+          color="secondary"
+        >
+          {'Create NFT'}
+        </Button>
+      </Stack>
     </Scrollbar>
   );
 

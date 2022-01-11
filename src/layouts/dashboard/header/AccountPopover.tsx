@@ -6,6 +6,7 @@ import useENSName from '../../../hooks/useENSName';
 import { UserRejectedRequestError } from '@web3-react/injected-connector';
 import { injected } from '../../../connectors';
 import useMetaMaskOnboarding from "../../../hooks/useMetaMaskOnboarding";
+import useMetamask from "../../../hooks/useMetamask";
 
 
 export default function AccountPopover() {
@@ -27,6 +28,7 @@ export default function AccountPopover() {
   const handleOpen = () => {
     setOpen(true);
   };
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -42,10 +44,6 @@ export default function AccountPopover() {
         setError(error);
       }
     });
-  };
-
-  const handleDisconnectWallet = () => {
-    //disconnectWallet();
   };
 
   useEffect(() => {

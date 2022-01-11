@@ -18,6 +18,8 @@ const useMetamask = ({ triedToEagerConnect }: AccountProps) => {
   const { isMetaMaskInstalled, isWeb3Available, startOnboarding, stopOnboarding } =
     useMetaMaskOnboarding();
 
+  const [metamaskAddress, setMetamaskAddress] = useState<any>("")
+
   // manage connecting state for injected connector
   const [connecting, setConnecting] = useState(false);
   useEffect(() => {
@@ -29,11 +31,9 @@ const useMetamask = ({ triedToEagerConnect }: AccountProps) => {
 
   const ENSName = useENSName(account);
 
-  const { metamaskAddress, setMetamaskAddress } = useContext(GlobalContext);
-
-    if (account != null) {
-        setMetamaskAddress(ENSName || account ? `${shortenHex(account, 4)}` : null);
-    }
+  if (account != null) {
+      setMetamaskAddress(ENSName || account ? `${shortenHex(account, 4)}` : null);
+  }
 
   if (error) {
     return { error: null };
@@ -72,7 +72,7 @@ const useMetamask = ({ triedToEagerConnect }: AccountProps) => {
   };
   const address = ENSName || `${shortenHex(account, 4)}`;
 
-  return { href, address };
+  return { href, address, metamaskAddress, setMetamaskAddress };
 };
 
 export default useMetamask;
