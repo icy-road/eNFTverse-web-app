@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { styled, useTheme } from '@mui/material/styles';
-import { Box, Stack, Drawer, Button } from '@mui/material';
+import { Box, Stack, Drawer, Button, useMediaQuery, Dialog, DialogTitle } from '@mui/material';
 import useResponsive from '../../../hooks/useResponsive';
 import useCollapseDrawer from '../../../hooks/useCollapseDrawer';
 import cssStyles from '../../../utils/cssStyles';
@@ -11,12 +11,8 @@ import Logo from '../../../components/Logo';
 import Scrollbar from '../../../components/Scrollbar';
 import NavSection from '../../../components/nav-section';
 import navConfig from './NavConfig';
-import useMetamask from '../../../hooks/useMetamask';
 import { useWeb3React } from '@web3-react/core';
-import useENSName from '../../../hooks/useENSName';
 import useMetaMaskOnboarding from '../../../hooks/useMetaMaskOnboarding';
-
-// ----------------------------------------------------------------------
 
 const RootStyle = styled('div')(({ theme }) => ({
   [theme.breakpoints.up('lg')]: {
@@ -36,18 +32,20 @@ type Props = {
 
 export default function DashboardNavbar({ isOpenSidebar, onCloseSidebar }: Props) {
   const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const { pathname } = useLocation();
 
   const { account } = useWeb3React();
 
-  const { isMetaMaskInstalled, isWeb3Available, startOnboarding, stopOnboarding } =
-    useMetaMaskOnboarding();
+  const { isMetaMaskInstalled, isWeb3Available } = useMetaMaskOnboarding();
 
   const isDesktop = useResponsive('up', 'lg');
 
   const { isCollapse, collapseClick, collapseHover, onToggleCollapse, onHoverEnter, onHoverLeave } =
     useCollapseDrawer();
+
+  const [openCreateNftDialog, setOpenCreateNftDialog] = useState(false);
 
   useEffect(() => {
     if (isOpenSidebar) {
@@ -87,6 +85,9 @@ export default function DashboardNavbar({ isOpenSidebar, onCloseSidebar }: Props
           disabled={!isMetaMaskInstalled || !isWeb3Available || typeof account !== 'string'}
           variant="contained"
           color="secondary"
+          onClick={() => {
+            setOpenCreateNftDialog(true);
+          }}
         >
           {'Create NFT'}
         </Button>
@@ -143,6 +144,16 @@ export default function DashboardNavbar({ isOpenSidebar, onCloseSidebar }: Props
           {renderContent}
         </Drawer>
       )}
+      <Dialog
+        fullScreen={fullScreen}
+        open={openCreateNftDialog}
+        onClose={() => {
+          setOpenCreateNftDialog(false);
+        }}
+        aria-labelledby="responsive-dialog-title"
+      >
+        <DialogTitle id="responsive-dialog-title">{'Create NFT'}</DialogTitle>
+      </Dialog>
     </RootStyle>
   );
 }
