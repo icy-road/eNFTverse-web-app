@@ -13,6 +13,7 @@ import NavSection from '../../../components/nav-section';
 import navConfig from './NavConfig';
 import { useWeb3React } from '@web3-react/core';
 import useMetaMaskOnboarding from '../../../hooks/useMetaMaskOnboarding';
+import CreateNFTDialog from '../../../components/CreateNFT Dialog';
 
 const RootStyle = styled('div')(({ theme }) => ({
   [theme.breakpoints.up('lg')]: {
@@ -89,7 +90,9 @@ export default function DashboardNavbar({ isOpenSidebar, onCloseSidebar }: Props
             setOpenCreateNftDialog(true);
           }}
         >
-          {'Create NFT'}
+          {!isMetaMaskInstalled || !isWeb3Available || typeof account !== 'string'
+            ? 'Connect Wallet to create NFT'
+            : 'Create NFT'}
         </Button>
       </Stack>
     </Scrollbar>
@@ -144,16 +147,10 @@ export default function DashboardNavbar({ isOpenSidebar, onCloseSidebar }: Props
           {renderContent}
         </Drawer>
       )}
-      <Dialog
-        fullScreen={fullScreen}
-        open={openCreateNftDialog}
-        onClose={() => {
-          setOpenCreateNftDialog(false);
-        }}
-        aria-labelledby="responsive-dialog-title"
-      >
-        <DialogTitle id="responsive-dialog-title">{'Create NFT'}</DialogTitle>
-      </Dialog>
+      <CreateNFTDialog
+        openCreateNftDialog={openCreateNftDialog}
+        setOpenCreateNftDialog={setOpenCreateNftDialog}
+      />
     </RootStyle>
   );
 }
