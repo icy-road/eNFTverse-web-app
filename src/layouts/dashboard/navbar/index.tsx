@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { styled, useTheme } from '@mui/material/styles';
-import { Box, Stack, Drawer, Button, useMediaQuery, Dialog, DialogTitle } from '@mui/material';
+import { Box, Stack, Drawer, Button } from '@mui/material';
 import useResponsive from '../../../hooks/useResponsive';
 import useCollapseDrawer from '../../../hooks/useCollapseDrawer';
 import cssStyles from '../../../utils/cssStyles';
@@ -13,7 +13,8 @@ import NavSection from '../../../components/nav-section';
 import navConfig from './NavConfig';
 import { useWeb3React } from '@web3-react/core';
 import useMetaMaskOnboarding from '../../../hooks/useMetaMaskOnboarding';
-import CreateNFTDialog from '../../../components/CreateNFT Dialog';
+import CreateNFTDialog from '../../../components/CreateNFTDialog';
+import useENSName from '../../../hooks/useENSName';
 
 const RootStyle = styled('div')(({ theme }) => ({
   [theme.breakpoints.up('lg')]: {
@@ -38,7 +39,7 @@ export default function DashboardNavbar({ isOpenSidebar, onCloseSidebar }: Props
 
   const { account } = useWeb3React();
 
-  const { isMetaMaskInstalled, isWeb3Available, metamaskAddress } = useMetaMaskOnboarding();
+  const { isMetaMaskInstalled, isWeb3Available } = useMetaMaskOnboarding();
 
   const isDesktop = useResponsive('up', 'lg');
 
@@ -46,13 +47,23 @@ export default function DashboardNavbar({ isOpenSidebar, onCloseSidebar }: Props
     useCollapseDrawer();
 
   const [openCreateNftDialog, setOpenCreateNftDialog] = useState(false);
+  const [metamaskAddress, setMetamaskAddress] = useState<any>('');
 
-  useEffect(() => {
+  const ENSName = useENSName(account);
+
+
+    useEffect(() => {
     if (isOpenSidebar) {
       onCloseSidebar();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
+
+  useEffect(() => {
+    if (account) {
+      setMetamaskAddress(ENSName || account ? account : null);
+    }
+  }, [account]);
 
   const renderContent = (
     <Scrollbar

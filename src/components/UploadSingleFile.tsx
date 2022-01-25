@@ -117,7 +117,7 @@ export default function UploadSingleFile({ error = false, file, sx, ...other }: 
         {file && (
           <Image
             alt="file preview"
-            src={isString(file) ? file : file.preview}
+            src={isString(file) ? file : URL.createObjectURL(file)}
             sx={{
               top: 8,
               borderRadius: 1,

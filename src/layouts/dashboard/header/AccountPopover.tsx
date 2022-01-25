@@ -5,15 +5,21 @@ import { useWeb3React } from '@web3-react/core';
 import useENSName from '../../../hooks/useENSName';
 import { UserRejectedRequestError } from '@web3-react/injected-connector';
 import { injected } from '../../../connectors';
-import useMetaMaskOnboarding from "../../../hooks/useMetaMaskOnboarding";
-
+import useMetaMaskOnboarding from '../../../hooks/useMetaMaskOnboarding';
+import { shortenHex } from '../../../utils/helper';
 
 export default function AccountPopover() {
   const anchorRef = useRef(null);
 
   const { active, error, activate, chainId, account, setError } = useWeb3React();
 
-  const { isMetaMaskInstalled, isWeb3Available, startOnboarding, stopOnboarding } = useMetaMaskOnboarding();
+  const {
+    isMetaMaskInstalled,
+    isWeb3Available,
+    startOnboarding,
+    stopOnboarding,
+    setMetamaskAddress,
+  } = useMetaMaskOnboarding();
 
   const ENSName = useENSName(account);
 
@@ -51,6 +57,12 @@ export default function AccountPopover() {
       stopOnboarding();
     }
   }, [active, error, stopOnboarding]);
+
+  useEffect(() => {
+    if (account != null) {
+      setMetamaskAddress(ENSName || account ? `${shortenHex(account, 4)}` : null);
+    }
+  }, [account]);
 
   if (typeof account !== 'string') {
     return (
