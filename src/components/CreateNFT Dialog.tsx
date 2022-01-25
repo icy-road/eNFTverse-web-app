@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   Autocomplete,
   Button,
@@ -15,20 +15,39 @@ import { useTheme } from '@mui/material/styles';
 import { Form, FormikProvider, useFormik } from 'formik';
 import * as Yup from 'yup';
 import { LoadingButton } from '@mui/lab';
+import UploadSingleFile, { CustomFile } from './UploadSingleFile';
+import { generateIPFSMetadataHash } from '../api/ApiClient';
+import { useWeb3React } from '@web3-react/core';
+import { Web3Provider } from '@ethersproject/providers';
+import Web3 from 'web3';
 
 type Props = {
   openCreateNftDialog: boolean;
   setOpenCreateNftDialog: Function;
+  metamaskAddress: string
 };
 
 const TAGS_OPTION = ['Art'];
 
-export default function CreateNFTDialog({ openCreateNftDialog, setOpenCreateNftDialog }: Props) {
+const nftContractABI = require('../utils/NFTContract.json');
+
+export default function CreateNFTDialog({ openCreateNftDialog, setOpenCreateNftDialog, metamaskAddress }: Props) {
+  const web3 = new Web3('https://cronos-testnet-3.crypto.org:8545');
+
+  const nftContractAddress = '0x94667a5A3042f3369033F9476bFf9A0E51f361d7';
+
+  const nftContract = new web3.eth.Contract(nftContractABI, nftContractAddress);
+
+  const { library, chainId } = useWeb3React<Web3Provider>();
+
   const NewProductSchema = Yup.object().shape({
     nftName: Yup.string().required('Name is required'),
     nftDescription: Yup.string().required('Description is required'),
     author: Yup.string().required('Author is required'),
     tags: Yup.array().min(1, 'Tags are required'),
+    image: Yup.object().shape({
+      preview: Yup.string().required('Image is required'),
+    }),
   });
 
   const formik = useFormik({
@@ -38,11 +57,41 @@ export default function CreateNFTDialog({ openCreateNftDialog, setOpenCreateNftD
       nftDescription: '',
       author: '',
       tags: [TAGS_OPTION[0]],
+      image: {} as CustomFile,
     },
     validationSchema: NewProductSchema,
     onSubmit: async (values, { setSubmitting, resetForm, setErrors }) => {
-      console.log('SBUMIT');
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      if (library) {
+        generateIPFSMetadataHash(values).then(async ({ data }) => {
+          console.log('got', data);
+          console.log('metamaskAddress', metamaskAddress);
+          const sender = metamaskAddress;
+
+          const mintToEncodedAbi = await nftContract.methods
+            .mint(data.ipfsMetadataHash)
+            .encodeABI();
+
+          // const mintToEncodedAbi = await nftContract.mintToEncodedAbi(
+          //   data.ipfsMetadataHash
+          // );
+
+          const nonce = await library.getTransactionCount(sender);
+          const transactionData = {
+            from: sender,
+            to: nftContractAddress,
+            data: mintToEncodedAbi,
+            gasPrice: await library.getGasPrice(),
+            nonce,
+          };
+          const gasPrice = await library.estimateGas(transactionData);
+          // @ts-ignore
+          library.sendTransaction(transactionData).on('transactionHash', async (txHash) => {
+            console.log('txHash:');
+            console.log(txHash);
+            window.open(`{{config.web3.explorer}}/tx/${txHash}/`);
+          });
+        });
+      }
 
       try {
         resetForm();
@@ -60,6 +109,25 @@ export default function CreateNFTDialog({ openCreateNftDialog, setOpenCreateNftD
 
   const { errors, values, touched, handleSubmit, isSubmitting, setFieldValue, getFieldProps } =
     formik;
+
+  const handleDrop = useCallback(
+    (acceptedFiles) => {
+      const file = acceptedFiles[0];
+
+      setFieldValue(
+        'image',
+        Object.assign(
+          {},
+          {
+            preview: URL.createObjectURL(file),
+            path: file.path,
+            size: file.size,
+          }
+        )
+      );
+    },
+    [setFieldValue]
+  );
 
   return (
     <Dialog
@@ -83,6 +151,13 @@ export default function CreateNFTDialog({ openCreateNftDialog, setOpenCreateNftD
                 pt: 3,
               }}
             >
+              <UploadSingleFile
+                maxSize={3145728}
+                accept={'image/*'}
+                file={values.image}
+                onDrop={handleDrop}
+                error={Boolean(touched.image && errors.image)}
+              />
               <TextField
                 color="secondary"
                 label="Name*"

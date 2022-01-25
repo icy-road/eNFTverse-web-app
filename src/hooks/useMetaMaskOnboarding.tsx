@@ -7,6 +7,8 @@ export default function useMetaMaskOnboarding() {
 
   const [isMetaMaskInstalled, isMetaMaskInstalledSet] = useState<boolean>()
 
+  const [metamaskAddress, setMetamaskAddress] = useState<any>("")
+
   useEffect(() => {
     if (typeof window === 'undefined') {
       return;
@@ -48,6 +50,8 @@ export default function useMetaMaskOnboarding() {
     startOnboarding,
     stopOnboarding,
     isMetaMaskInstalled,
-    isWeb3Available
+    isWeb3Available,
+    metamaskAddress,
+    setMetamaskAddress
   };
 }

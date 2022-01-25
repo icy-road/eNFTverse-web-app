@@ -33,13 +33,12 @@ type Props = {
 
 export default function DashboardNavbar({ isOpenSidebar, onCloseSidebar }: Props) {
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const { pathname } = useLocation();
 
   const { account } = useWeb3React();
 
-  const { isMetaMaskInstalled, isWeb3Available } = useMetaMaskOnboarding();
+  const { isMetaMaskInstalled, isWeb3Available, metamaskAddress } = useMetaMaskOnboarding();
 
   const isDesktop = useResponsive('up', 'lg');
 
@@ -148,6 +147,7 @@ export default function DashboardNavbar({ isOpenSidebar, onCloseSidebar }: Props
         </Drawer>
       )}
       <CreateNFTDialog
+        metamaskAddress={metamaskAddress}
         openCreateNftDialog={openCreateNftDialog}
         setOpenCreateNftDialog={setOpenCreateNftDialog}
       />
