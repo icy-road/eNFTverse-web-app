@@ -8,9 +8,10 @@ import SkeletonProductItem from "../../../../components/skeleton/SkeletonProduct
 type Props = {
   products: Product[];
   isDefault: boolean;
+  loadingCount?: number
 };
 
-export default function ShopProductList({ products, isDefault }: Props) {
+export default function ShopProductList({ products, isDefault, loadingCount }: Props) {
   const loading = !products.length && isDefault;
 
   return (
@@ -26,7 +27,7 @@ export default function ShopProductList({ products, isDefault }: Props) {
         },
       }}
     >
-      {(loading ? [...Array(12)] : products).map((product, index) =>
+      {(loading ? [...Array(loadingCount ? loadingCount : 12)] : products).map((product, index) =>
         product ? (
           <ShopProductCard key={product.id} product={product} />
         ) : (

@@ -43,7 +43,7 @@ export default function DashboardNavbar({ isOpenSidebar, onCloseSidebar }: Props
 
   const isDesktop = useResponsive('up', 'lg');
 
-  const { isCollapse, collapseClick, collapseHover, onToggleCollapse, onHoverEnter, onHoverLeave } =
+  const { isCollapse, collapseClick, collapseHover, onHoverEnter, onHoverLeave } =
     useCollapseDrawer();
 
   const [openCreateNftDialog, setOpenCreateNftDialog] = useState(false);
