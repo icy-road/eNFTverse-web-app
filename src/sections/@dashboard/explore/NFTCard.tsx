@@ -1,13 +1,15 @@
 import { Nft } from '../../../@types/nft';
-import { Box, Card, Link, Stack, Typography } from '@mui/material';
+import { Box, Button, Card, Link, Stack, Typography } from '@mui/material';
 import Image from '../../../components/Image';
-import { Link as RouterLink } from 'react-router-dom';
+import React from 'react';
 
 type Props = {
   nft: Nft;
+  forListing?: boolean;
+  prepareListForSale?: Function;
 };
 
-export default function NFTCard({ nft }: Props) {
+export default function NFTCard({ nft, forListing, prepareListForSale }: Props) {
   const { name, image, description } = nft;
 
   return (
@@ -25,11 +27,23 @@ export default function NFTCard({ nft }: Props) {
           {name}
         </Typography>
 
-        <Stack  direction="row" alignItems="center" justifyContent="space-between">
-          <Typography variant="body2">
-            {description}
-          </Typography>
+        <Stack direction="row" alignItems="center" justifyContent="space-between">
+          <Typography variant="body2">{description}</Typography>
         </Stack>
+      </Stack>
+      <Stack spacing={2} sx={{ p: 3 }}>
+        <Button
+          disabled={!forListing}
+          variant="contained"
+          color="secondary"
+          onClick={() => {
+            if (prepareListForSale) {
+              prepareListForSale(nft);
+            }
+          }}
+        >
+          List for Sale
+        </Button>
       </Stack>
     </Card>
   );

@@ -1,15 +1,39 @@
 import { Nft } from '../../../@types/nft';
-import { Box } from '@mui/material';
+import {
+  Autocomplete,
+  Box,
+  Button,
+  Chip,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Snackbar,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material';
 import SkeletonProductItem from '../../../components/skeleton/SkeletonProductItem';
 import { NFTCard } from './index';
+import React from 'react';
+import { Alert, LoadingButton } from '@mui/lab';
+import { Form, FormikProvider } from 'formik';
+import UploadSingleFile from '../../../components/UploadSingleFile';
 
 type Props = {
   nfts: Nft[];
   isDefault: boolean;
   loadingCount?: number;
+  forListing?: boolean;
+  prepareListForSale?: Function;
 };
 
-export default function ExploreNFTList({ nfts, isDefault, loadingCount }: Props) {
+export default function ExploreNFTList({
+  nfts,
+  isDefault,
+  loadingCount,
+  forListing,
+  prepareListForSale,
+}: Props) {
   const loading = !nfts.length && isDefault;
 
   return (
@@ -26,7 +50,11 @@ export default function ExploreNFTList({ nfts, isDefault, loadingCount }: Props)
       }}
     >
       {(loading ? [...Array(loadingCount ? loadingCount : 12)] : nfts).map((nft, index) =>
-        nft ? <NFTCard nft={nft} /> : <SkeletonProductItem key={index} />
+        nft ? (
+          <NFTCard prepareListForSale={prepareListForSale} forListing={forListing} nft={nft} />
+        ) : (
+          <SkeletonProductItem key={index} />
+        )
       )}
     </Box>
   );
