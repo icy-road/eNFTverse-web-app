@@ -20,14 +20,14 @@ import Web3 from 'web3';
 import useENSName from '../hooks/useENSName';
 import { LoadingButton } from '@mui/lab';
 import {Web3Provider} from "@ethersproject/providers";
-import {EXPLORER_URL} from "../api/config";
+import {CONTRACT_ADDRESS, EXPLORER_URL, WEB3_PROVIDER} from "../api/config";
 
 const nftContractABI = require('../utils/NFTContract.json');
 
 export default function Marketplace() {
   const { themeStretch } = useSettings();
 
-  const web3 = new Web3('https://cronos-testnet-3.crypto.org:8545');
+  const web3 = new Web3(WEB3_PROVIDER ?? '');
 
   const { account, library } = useWeb3React();
 
@@ -40,7 +40,7 @@ export default function Marketplace() {
 
   const ENSName = useENSName(account);
 
-  const nftContractAddress = '0x94667a5A3042f3369033F9476bFf9A0E51f361d7';
+  const nftContractAddress = CONTRACT_ADDRESS;
 
   const nftContract = new web3.eth.Contract(nftContractABI, nftContractAddress);
 
@@ -50,9 +50,13 @@ export default function Marketplace() {
       if (account) {
         const metamaskAddress = ENSName || account ? account : null;
 
+        setPendingEnabling(true)
+
         const isApprovedResponse = await nftContract.methods
           .isApprovedForAll(metamaskAddress, nftContractAddress)
           .call();
+
+        setPendingEnabling(false)
 
         setMarketPlaceApproved(isApprovedResponse);
       }
@@ -143,7 +147,7 @@ export default function Marketplace() {
             <ShopProductList loadingCount={4} isDefault={true} products={[]} />
           </Box>
         ) : (
-          <ShopProductList isDefault={true} products={products} />
+          <ShopProductList loadingCount={4} isDefault={true} products={products} />
         )}
       </Container>
     </Page>

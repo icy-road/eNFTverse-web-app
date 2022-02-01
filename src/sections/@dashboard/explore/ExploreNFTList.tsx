@@ -6,9 +6,10 @@ import { NFTCard } from './index';
 type Props = {
   nfts: Nft[];
   isDefault: boolean;
+  loadingCount?: number;
 };
 
-export default function ExploreNFTList({ nfts, isDefault }: Props) {
+export default function ExploreNFTList({ nfts, isDefault, loadingCount }: Props) {
   const loading = !nfts.length && isDefault;
 
   return (
@@ -24,7 +25,7 @@ export default function ExploreNFTList({ nfts, isDefault }: Props) {
         },
       }}
     >
-      {(loading ? [...Array(12)] : nfts).map((nft, index) =>
+      {(loading ? [...Array(loadingCount ? loadingCount : 12)] : nfts).map((nft, index) =>
         nft ? <NFTCard nft={nft} /> : <SkeletonProductItem key={index} />
       )}
     </Box>

@@ -3,9 +3,9 @@ import { Container, Typography } from '@mui/material';
 import Page from '../components/Page';
 import useSettings from '../hooks/useSettings';
 import Web3 from 'web3';
-import { Product } from '../@types/product';
 import { Nft } from '../@types/nft';
 import { ExploreNFTList } from '../sections/@dashboard/explore';
+import {CONTRACT_ADDRESS, WEB3_PROVIDER} from "../api/config";
 
 const nftContractABI = require('../utils/NFTContract.json');
 const superagent = require('superagent');
@@ -20,10 +20,10 @@ export default function ExploreNFTs() {
   }, []);
 
   async function fetchNfts() {
-    const web3 = new Web3('https://cronos-testnet-3.crypto.org:8545');
+    const web3 = new Web3(WEB3_PROVIDER ?? '');
     const nftContract = new web3.eth.Contract(
       nftContractABI,
-      '0x94667a5A3042f3369033F9476bFf9A0E51f361d7'
+      CONTRACT_ADDRESS
     );
 
     const totalSupply = await nftContract.methods.totalSupply().call();

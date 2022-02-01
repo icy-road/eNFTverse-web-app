@@ -13,6 +13,7 @@ const ICONS = {
   analytics: getIcon('ic_analytics'),
   dashboard: getIcon('ic_dashboard'),
   search: getIcon('ic_search'),
+  wallet: getIcon('ic_wallet'),
 };
 
 const sidebarConfig = [
@@ -22,6 +23,7 @@ const sidebarConfig = [
     subheader: '',
     items: [
       { title: 'Marketplace', path: '/marketplace', icon: ICONS.ecommerce },
+      { title: 'Owned NFTs', path: '/owned', icon: ICONS.wallet },
       { title: 'Explore', path: '/explore-nfts', icon: ICONS.search },
     ],
   },

@@ -21,7 +21,7 @@ import { generateIPFSMetadataHash } from '../api/ApiClient';
 import { useWeb3React } from '@web3-react/core';
 import { Web3Provider } from '@ethersproject/providers';
 import Web3 from 'web3';
-import {EXPLORER_URL} from "../api/config";
+import {CONTRACT_ADDRESS, EXPLORER_URL, WEB3_PROVIDER} from "../api/config";
 
 type Props = {
   openCreateNftDialog: boolean;
@@ -38,9 +38,9 @@ export default function CreateNFTDialog({
   setOpenCreateNftDialog,
   metamaskAddress,
 }: Props) {
-  const web3 = new Web3('https://cronos-testnet-3.crypto.org:8545');
+  const web3 = new Web3(WEB3_PROVIDER ?? '');
 
-  const nftContractAddress = '0x94667a5A3042f3369033F9476bFf9A0E51f361d7';
+  const nftContractAddress = CONTRACT_ADDRESS;
 
   const nftContract = new web3.eth.Contract(nftContractABI, nftContractAddress);
 
