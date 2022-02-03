@@ -1,14 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import {
-  Backdrop,
-  Box,
-  Button,
-  CircularProgress,
-  Container,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Backdrop, Box, Container, Typography } from '@mui/material';
 import useSettings from '../hooks/useSettings';
 import Page from '../components/Page';
 
@@ -19,10 +11,10 @@ import useMetaMaskOnboarding from '../hooks/useMetaMaskOnboarding';
 import Web3 from 'web3';
 import useENSName from '../hooks/useENSName';
 import { LoadingButton } from '@mui/lab';
-import {Web3Provider} from "@ethersproject/providers";
-import {CONTRACT_ADDRESS, EXPLORER_URL, WEB3_PROVIDER} from "../api/config";
+import { CONTRACT_ADDRESS, EXPLORER_URL, MARKETPLACE_ADDRESS, WEB3_PROVIDER } from '../api/config';
 
 const nftContractABI = require('../utils/NFTContract.json');
+const marketplaceABI = require('../utils/marketplaceAbi.json');
 
 export default function Marketplace() {
   const { themeStretch } = useSettings();
@@ -42,23 +34,30 @@ export default function Marketplace() {
 
   const nftContractAddress = CONTRACT_ADDRESS;
 
+  const marketplaceAddress = MARKETPLACE_ADDRESS;
+
   const nftContract = new web3.eth.Contract(nftContractABI, nftContractAddress);
 
+  const marketPlaceContract = new web3.eth.Contract(marketplaceABI, marketplaceAddress);
 
   useEffect(() => {
     async function checkIfMarketplaceEnabled() {
       if (account) {
         const metamaskAddress = ENSName || account ? account : null;
 
-        setPendingEnabling(true)
+        setPendingEnabling(true);
 
         const isApprovedResponse = await nftContract.methods
-          .isApprovedForAll(metamaskAddress, nftContractAddress)
+          .isApprovedForAll(metamaskAddress, marketplaceAddress)
           .call();
 
-        setPendingEnabling(false)
+        setPendingEnabling(false);
 
         setMarketPlaceApproved(isApprovedResponse);
+
+        const tokenCount = await nftContract.methods.totalSupply().call();
+
+        enableNFTs()
       }
     }
 
@@ -66,11 +65,11 @@ export default function Marketplace() {
   }, [account]);
 
   const enableNFTs = async () => {
-    setPendingEnabling(true)
+    setPendingEnabling(true);
 
     const approveForAllAbi = await nftContract.methods
-        .setApprovalForAll(nftContractAddress, true)
-        .encodeABI();
+      .setApprovalForAll(marketplaceAddress, true)
+      .encodeABI();
 
     const metamaskAddress = ENSName || account ? account : null;
 
@@ -89,19 +88,17 @@ export default function Marketplace() {
 
     // @ts-ignore
     window.web3.eth
-        .sendTransaction(params)
-        .on('transactionHash', async (txHash: any) => {
-          console.log('txHash:');
-          console.log(txHash);
-          window.open(`${EXPLORER_URL}/tx/${txHash}/`);
+      .sendTransaction(params)
+      .on('transactionHash', async (txHash: any) => {
+        window.open(`${EXPLORER_URL}/tx/${txHash}/`);
 
-          setPendingEnabling(false)
-          setMarketPlaceApproved(true);
-        })
-        .catch((err: any) => {
-          console.log(err);
-          setPendingEnabling(false)
-        });
+        setPendingEnabling(false);
+        setMarketPlaceApproved(true);
+      })
+      .catch((err: any) => {
+        console.log(err);
+        setPendingEnabling(false);
+      });
   };
 
   return (
