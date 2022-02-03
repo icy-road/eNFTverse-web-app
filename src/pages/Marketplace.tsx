@@ -76,8 +76,6 @@ export default function Marketplace() {
 
               const nftMetadata: any = (await superagent.get(nftAddress)).body;
 
-              console.log(nftMetadata);
-
               products.push({
                 nftId: nftId,
                 contractAddress: nftContractAddress ?? '',
