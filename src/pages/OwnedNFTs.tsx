@@ -156,7 +156,6 @@ export default function OwnedNFTs() {
         const nftAddress = await nftContract.methods.tokenURI(nftId).call();
 
         const nftMetadata: any = (await superagent.get(nftAddress)).body;
-
         fetchedNfts.push({
           id: nftId,
           image: nftMetadata.image,

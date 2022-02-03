@@ -5,6 +5,7 @@ export type ProductCategory = 'Art';
 export type Product = {
   nftId: string;
   contractAddress: string;
+  author: string;
   image: string;
   name: string;
   price: number;

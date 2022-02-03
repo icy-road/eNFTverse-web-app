@@ -16,6 +16,8 @@ import { CONTRACT_ADDRESS, EXPLORER_URL, MARKETPLACE_ADDRESS, WEB3_PROVIDER } fr
 const nftContractABI = require('../utils/NFTContract.json');
 const marketplaceABI = require('../utils/marketplaceAbi.json');
 
+const superagent = require('superagent');
+
 export default function Marketplace() {
   const { themeStretch } = useSettings();
 
@@ -55,9 +57,46 @@ export default function Marketplace() {
 
         setMarketPlaceApproved(isApprovedResponse);
 
-        const tokenCount = await nftContract.methods.totalSupply().call();
+        const tokenCount = await marketPlaceContract.methods
+          .getNumberOfItemsListedForContract(nftContractAddress)
+          .call();
 
-        enableNFTs()
+        const products: Product[] = [];
+
+        if (tokenCount > 0) {
+          try {
+            const marketPlaceItems = await marketPlaceContract.methods
+              .fetchMarketplaceItems(nftContractAddress, 0, tokenCount - 1)
+              .call();
+
+            for (const marketPlaceItem of marketPlaceItems) {
+              const nftId = marketPlaceItem.tokenId;
+
+              const nftAddress = await nftContract.methods.tokenURI(nftId).call();
+
+              const nftMetadata: any = (await superagent.get(nftAddress)).body;
+
+              console.log(nftMetadata);
+
+              products.push({
+                nftId: nftId,
+                contractAddress: nftContractAddress ?? '',
+                author: nftAddress.author,
+                image: nftMetadata.image,
+                name: nftMetadata.name,
+                price: marketPlaceItem.price,
+                priceSale: null,
+                status: 'sale',
+                description: nftMetadata.description,
+                category: 'Art',
+              });
+            }
+
+            setProducts(products);
+          } catch (e) {
+            console.log(e);
+          }
+        }
       }
     }
 
