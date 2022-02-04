@@ -9,13 +9,14 @@ import SkeletonNft from '../components/skeleton/SkeletonNft';
 import Image from '../components/Image';
 import ProductDetailsSummary from 'src/sections/@dashboard/e-commerce/product/ProductDetailsSummary';
 import { Product } from '../@types/product';
-import { CONTRACT_ADDRESS, WEB3_PROVIDER } from '../api/config';
+import {CONTRACT_ADDRESS, MARKETPLACE_ADDRESS, WEB3_PROVIDER} from '../api/config';
 import Web3 from 'web3';
 import { useWeb3React } from '@web3-react/core';
 import useMetaMaskOnboarding from '../hooks/useMetaMaskOnboarding';
 import ProgressBar from '../components/ProgressBar';
 
 const nftContractABI = require('../utils/NFTContract.json');
+const marketplaceABI = require('../utils/marketplaceAbi.json');
 
 const superagent = require('superagent');
 
@@ -23,17 +24,19 @@ export default function NFTDetails() {
   const { themeStretch } = useSettings();
   const [value, setValue] = useState('1');
   const { id = '' } = useParams();
+  const { contractAddress = CONTRACT_ADDRESS } = useParams();
   const [product, setProduct] = useState({} as Product);
 
-  const nftContractAddress = CONTRACT_ADDRESS;
+  const marketplaceAddress = MARKETPLACE_ADDRESS;
 
   const web3 = new Web3(WEB3_PROVIDER ?? '');
+  const nftContract = new web3.eth.Contract(nftContractABI, contractAddress);
+  const marketPlaceContract = new web3.eth.Contract(marketplaceABI, marketplaceAddress);
 
   const { account, library } = useWeb3React();
 
   const { isMetaMaskInstalled, isWeb3Available } = useMetaMaskOnboarding();
 
-  const nftContract = new web3.eth.Contract(nftContractABI, nftContractAddress);
 
   useEffect(() => {
     async function fetchNftDetails() {
@@ -41,13 +44,17 @@ export default function NFTDetails() {
 
       const nftMetadata: any = (await superagent.get(nftAddress)).body;
 
+      const marketPlaceItem = await marketPlaceContract.methods
+          .getMarketplaceItemByNFT(contractAddress, id)
+          .call();
+
       setProduct({
         nftId: id,
-        contractAddress: nftContractAddress ?? '',
+        contractAddress: contractAddress ?? '',
         author: nftAddress.author,
         image: nftMetadata.image,
         name: nftMetadata.name,
-        price: 25,
+        price: marketPlaceItem.price,
         priceSale: null,
         status: 'sale',
         description: nftMetadata.description,

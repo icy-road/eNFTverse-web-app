@@ -126,14 +126,6 @@ export default function ProductDetailsSummary({ product, ...other }: Props) {
                       </Link>
                     </Grid>
                   </Grid>
-                  <Grid container spacing={2} justifyContent={'space-between'}>
-                    <Grid item xs={8}>
-                      <Typography paragraph>Token Standard</Typography>
-                    </Grid>
-                    <Grid item xs={4} display={'flex'} justifyContent={'flex-end'}>
-                      <Typography variant="body2">ERC-721</Typography>
-                    </Grid>
-                  </Grid>
                 </Box>
               </TabPanel>
             </TabContext>

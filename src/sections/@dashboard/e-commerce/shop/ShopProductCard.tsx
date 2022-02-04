@@ -10,9 +10,9 @@ type Props = {
 };
 
 export default function ShopProductCard({ product }: Props) {
-  const { nftId, name, description, image, price } = product;
+  const { nftId, name, description, image, price, contractAddress } = product;
 
-  const linkTo = `/marketplace/nft/${paramCase(nftId)}`;
+  const linkTo = `/marketplace/nft/${paramCase(nftId)}/${contractAddress}`;
 
   return (
     <Card
