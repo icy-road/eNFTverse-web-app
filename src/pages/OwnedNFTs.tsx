@@ -67,6 +67,7 @@ export default function OwnedNFTs() {
   const [listing, setListing] = useState(false);
 
   const [openListNftDialog, setOpenListNftDialog] = useState(false);
+  const [pendingEnabling, setPendingEnabling] = useState(false);
 
   const [selectedNft, setSelectedNft] = useState<Nft>({} as Nft);
 
@@ -133,6 +134,43 @@ export default function OwnedNFTs() {
   });
 
   const { errors, values, touched, handleSubmit, setFieldValue, getFieldProps, resetForm } = formik;
+
+  const enableMarketplace = async () => {
+    setPendingEnabling(true);
+
+    const approveForAllAbi = await nftContract.methods
+      .setApprovalForAll(marketplaceAddress, true)
+      .encodeABI();
+
+    const metamaskAddress = ENSName || account ? account : null;
+
+    const params = {
+      from: metamaskAddress,
+      to: nftContractAddress,
+      data: approveForAllAbi,
+    };
+
+    const gasPrice = await library.estimateGas(params);
+
+    // @ts-ignore
+    await window.ethereum.enable();
+    // @ts-ignore
+    window.web3 = new Web3(window.ethereum);
+
+    // @ts-ignore
+    window.web3.eth
+      .sendTransaction(params)
+      .on('transactionHash', async (txHash: any) => {
+        window.open(`${EXPLORER_URL}/tx/${txHash}/`);
+
+        setPendingEnabling(false);
+        setMarketPlaceApproved(true);
+      })
+      .catch((err: any) => {
+        console.log(err);
+        setPendingEnabling(false);
+      });
+  };
 
   async function checkIfMarketplaceEnabled() {
     if (account) {
@@ -228,8 +266,35 @@ export default function OwnedNFTs() {
                   mb: 1,
                 }}
               >
-                <Alert severity="warning">
-                  Please enable marketplace in order to list NFTs for sale.
+                <Alert
+                  severity="warning"
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Typography>
+                      Please enable marketplace in order to list NFTs for sale.
+                    </Typography>
+                    <LoadingButton
+                      sx={{
+                        ml: 1,
+                      }}
+                      disabled={(!isMetaMaskInstalled || !isWeb3Available) && !marketPlaceApproved}
+                      variant="contained"
+                      color="secondary"
+                      onClick={enableMarketplace}
+                      loading={pendingEnabling}
+                    >
+                      Enable eNFTverse NFTs on marketplace
+                    </LoadingButton>
+                  </Box>
                 </Alert>
               </Box>
             ) : (

@@ -3,9 +3,14 @@ import { styled } from '@mui/material/styles';
 import { Box, Grid, Button, Divider, IconButton, Typography, Card, Tab, Link } from '@mui/material';
 import { Product } from '../../../../@types/product';
 import Iconify from '../../../../components/Iconify';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Markdown from '../../../../components/Markdown';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
+import { LoadingButton, TabContext, TabList, TabPanel } from '@mui/lab';
+import { useWeb3React } from '@web3-react/core';
+import useMetaMaskOnboarding from '../../../../hooks/useMetaMaskOnboarding';
+import Web3 from 'web3';
+import { EXPLORER_URL, MARKETPLACE_ADDRESS, WEB3_PROVIDER } from '../../../../api/config';
+import useENSName from '../../../../hooks/useENSName';
 
 const RootStyle = styled('div')(({ theme }) => ({
   padding: theme.spacing(3),
@@ -18,10 +23,124 @@ const RootStyle = styled('div')(({ theme }) => ({
 
 type Props = {
   product: Product;
+  contractAddress?: string;
 };
 
-export default function ProductDetailsSummary({ product, ...other }: Props) {
+const nftContractABI = require('../../../../utils/NFTContract.json');
+const marketplaceABI = require('../../../../utils/marketplaceAbi.json');
+
+const superagent = require('superagent');
+
+export default function ProductDetailsSummary({ product, contractAddress, ...other }: Props) {
   const { nftId, name, price, status, priceSale } = product;
+
+  const { account, library } = useWeb3React();
+
+  const { isMetaMaskInstalled, isWeb3Available } = useMetaMaskOnboarding();
+  const [marketPlaceApproved, setMarketPlaceApproved] = useState(false);
+  const [pendingEnabling, setPendingEnabling] = useState(false);
+  const [isBuying, setIsBuying] = useState(false);
+
+  const marketplaceAddress = MARKETPLACE_ADDRESS;
+
+  const web3 = new Web3(WEB3_PROVIDER ?? '');
+  const nftContract = new web3.eth.Contract(nftContractABI, contractAddress);
+  const marketPlaceContract = new web3.eth.Contract(marketplaceABI, marketplaceAddress);
+
+  const ENSName = useENSName(account);
+
+  useEffect(() => {
+    async function checkIfMarketplaceEnabled() {
+      if (account) {
+        const metamaskAddress = ENSName || account ? account : null;
+
+        setPendingEnabling(true);
+
+        const isApprovedResponse = await nftContract.methods
+          .isApprovedForAll(metamaskAddress, marketplaceAddress)
+          .call();
+
+        setPendingEnabling(false);
+
+        setMarketPlaceApproved(isApprovedResponse);
+      }
+    }
+
+    checkIfMarketplaceEnabled();
+  }, [account]);
+
+  const buyNft = async () => {
+    setIsBuying(true);
+
+    const buyNftAbi = await marketPlaceContract.methods.buyNFTById(contractAddress, nftId).encodeABI();
+
+    const metamaskAddress = ENSName || account ? account : null;
+
+    const params = {
+      from: metamaskAddress,
+      to: marketplaceAddress,
+      data: buyNftAbi,
+      value: price,
+    };
+    const gasPrice = await library.estimateGas(params);
+
+
+    // @ts-ignore
+    await window.ethereum.enable();
+    // @ts-ignore
+    window.web3 = new Web3(window.ethereum);
+
+    // @ts-ignore
+    window.web3.eth
+      .sendTransaction(params)
+      .on('transactionHash', async (txHash: any) => {
+        window.open(`${EXPLORER_URL}/tx/${txHash}/`);
+
+        setIsBuying(false);
+        setMarketPlaceApproved(true);
+      })
+      .catch((err: any) => {
+        console.log(err);
+        setIsBuying(false);
+      });
+  };
+
+  const enableNFTs = async () => {
+    setPendingEnabling(true);
+
+    const approveForAllAbi = await nftContract.methods
+      .setApprovalForAll(marketplaceAddress, true)
+      .encodeABI();
+
+    const metamaskAddress = ENSName || account ? account : null;
+
+    const params = {
+      from: metamaskAddress,
+      to: contractAddress,
+      data: approveForAllAbi,
+    };
+
+    const gasPrice = await library.estimateGas(params);
+
+    // @ts-ignore
+    await window.ethereum.enable();
+    // @ts-ignore
+    window.web3 = new Web3(window.ethereum);
+
+    // @ts-ignore
+    window.web3.eth
+      .sendTransaction(params)
+      .on('transactionHash', async (txHash: any) => {
+        window.open(`${EXPLORER_URL}/tx/${txHash}/`);
+
+        setPendingEnabling(false);
+        setMarketPlaceApproved(true);
+      })
+      .catch((err: any) => {
+        console.log(err);
+        setPendingEnabling(false);
+      });
+  };
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -113,7 +232,7 @@ export default function ProductDetailsSummary({ product, ...other }: Props) {
                   </Grid>
                   <Grid container spacing={2} justifyContent={'space-between'}>
                     <Grid item xs={8}>
-                      <Typography paragraph>NFT Address</Typography>
+                      <Typography paragraph>NFT ID</Typography>
                     </Grid>
                     <Grid item xs={4} display={'flex'} justifyContent={'flex-end'}>
                       <Link
@@ -131,17 +250,49 @@ export default function ProductDetailsSummary({ product, ...other }: Props) {
             </TabContext>
           </Card>
 
-          <Divider sx={{ borderStyle: 'dashed' }} />
-
-          <Box sx={{ mt: 5 }}>
-            <Grid container spacing={2} justifyContent="center">
-              <Grid item xs={12} sm={6}>
-                <Button fullWidth size="large" type="submit" color="info" variant="contained">
-                  Buy Now
-                </Button>
+          {!isMetaMaskInstalled ||
+          !isWeb3Available ||
+          typeof account !== 'string' ||
+          !marketPlaceApproved ? (
+            <Box sx={{ mt: 5 }}>
+              <Grid container spacing={2} justifyContent="center">
+                <Grid item xs={12} sm={6}>
+                  <LoadingButton
+                    disabled={
+                      (!isMetaMaskInstalled || !isWeb3Available || typeof account !== 'string') &&
+                      !marketPlaceApproved
+                    }
+                    variant="contained"
+                    color="secondary"
+                    onClick={enableNFTs}
+                    loading={pendingEnabling}
+                  >
+                    {typeof account !== 'string'
+                      ? 'Connect Metamask'
+                      : 'Enable eNFTverse NFTs on marketplace'}
+                  </LoadingButton>
+                </Grid>
               </Grid>
-            </Grid>
-          </Box>
+            </Box>
+          ) : (
+            <Box sx={{ mt: 5 }}>
+              <Grid container spacing={2} justifyContent="center">
+                <Grid item xs={12} sm={6}>
+                  <LoadingButton
+                    fullWidth
+                    size="large"
+                    type="submit"
+                    color="info"
+                    variant="contained"
+                    onClick={buyNft}
+                    loading={isBuying}
+                  >
+                    Buy Now
+                  </LoadingButton>
+                </Grid>
+              </Grid>
+            </Box>
+          )}
         </Form>
       </FormikProvider>
     </RootStyle>
