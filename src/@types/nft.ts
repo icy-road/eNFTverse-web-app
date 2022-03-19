@@ -5,3 +5,8 @@ export type Nft = {
   description: string;
   category: 'Art';
 };
+
+export type NftCollection = {
+  name: string;
+  address?: string;
+}

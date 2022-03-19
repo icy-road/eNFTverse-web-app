@@ -1,4 +1,4 @@
-export type ProductStatus = 'sale' | 'new' | '';
+export type ProductStatus = 'sale' | 'new' | 'sold' | '';
 
 export type ProductCategory = 'Art';
 

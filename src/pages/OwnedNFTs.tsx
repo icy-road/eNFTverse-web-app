@@ -91,7 +91,7 @@ export default function OwnedNFTs() {
             .listNFTForSale(
               nftContractAddress,
               selectedNft.id,
-              web3.utils.toWei(values.price.toString(), 'wei')
+              web3.utils.toWei(values.price.toString(), 'ether')
             )
             .encodeABI();
           const params = {
@@ -186,7 +186,7 @@ export default function OwnedNFTs() {
 
       const balanceNfts = await nftContract.methods.balanceOf(metamaskAddress).call();
 
-      setNftCount(balanceNfts);
+      setNftCount(Number(balanceNfts));
 
       for (let index = 0; index < balanceNfts; index++) {
         const nftId = await nftContract.methods.tokenOfOwnerByIndex(metamaskAddress, index).call();
@@ -216,6 +216,9 @@ export default function OwnedNFTs() {
     setSelectedNft(nft);
     setOpenListNftDialog(true);
   }
+
+  console.log(
+      nftCount)
 
   return (
     <Page title="Owned NFTs">

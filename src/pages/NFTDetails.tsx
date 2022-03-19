@@ -38,6 +38,8 @@ export default function NFTDetails() {
           .getMarketplaceItemByNFT(contractAddress, id)
           .call();
 
+      console.log(marketPlaceItem)
+
       setProduct({
         nftId: id,
         contractAddress: contractAddress ?? '',
@@ -46,7 +48,7 @@ export default function NFTDetails() {
         name: nftMetadata.name,
         price: marketPlaceItem.price,
         priceSale: null,
-        status: 'sale',
+        status: marketPlaceItem.price >0 ? 'sale' : 'sold',
         description: nftMetadata.description,
         category: 'Art',
       });

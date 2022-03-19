@@ -11,6 +11,7 @@ import useMetaMaskOnboarding from '../../../../hooks/useMetaMaskOnboarding';
 import Web3 from 'web3';
 import { EXPLORER_URL, MARKETPLACE_ADDRESS, WEB3_PROVIDER } from '../../../../api/config';
 import useENSName from '../../../../hooks/useENSName';
+import { useNavigate } from 'react-router-dom';
 
 const RootStyle = styled('div')(({ theme }) => ({
   padding: theme.spacing(3),
@@ -32,7 +33,8 @@ const marketplaceABI = require('../../../../utils/marketplaceAbi.json');
 const superagent = require('superagent');
 
 export default function ProductDetailsSummary({ product, contractAddress, ...other }: Props) {
-  const { nftId, name, price, status, priceSale } = product;
+  const navigate = useNavigate();
+  const { nftId, name, price, status } = product;
 
   const { account, library } = useWeb3React();
 
@@ -72,7 +74,9 @@ export default function ProductDetailsSummary({ product, contractAddress, ...oth
   const buyNft = async () => {
     setIsBuying(true);
 
-    const buyNftAbi = await marketPlaceContract.methods.buyNFTById(contractAddress, nftId).encodeABI();
+    const buyNftAbi = await marketPlaceContract.methods
+      .buyNFTById(contractAddress, nftId)
+      .encodeABI();
 
     const metamaskAddress = ENSName || account ? account : null;
 
@@ -84,7 +88,6 @@ export default function ProductDetailsSummary({ product, contractAddress, ...oth
     };
     const gasPrice = await library.estimateGas(params);
 
-
     // @ts-ignore
     await window.ethereum.enable();
     // @ts-ignore
@@ -94,6 +97,7 @@ export default function ProductDetailsSummary({ product, contractAddress, ...oth
     window.web3.eth
       .sendTransaction(params)
       .on('transactionHash', async (txHash: any) => {
+        navigate('/owned');
         window.open(`${EXPLORER_URL}/tx/${txHash}/`);
 
         setIsBuying(false);
@@ -160,13 +164,6 @@ export default function ProductDetailsSummary({ product, contractAddress, ...oth
 
   const { handleSubmit } = formik;
 
-  const handleAddCart = async () => {
-    try {
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   return (
     <RootStyle {...other}>
       <FormikProvider value={formik}>
@@ -177,7 +174,7 @@ export default function ProductDetailsSummary({ product, contractAddress, ...oth
               mt: 2,
               mb: 1,
               display: 'block',
-              color: status === 'sale' ? 'error.main' : 'info.main',
+              color: status === 'sold' ? 'error.main' : 'info.main',
             }}
           >
             {status}
@@ -187,9 +184,13 @@ export default function ProductDetailsSummary({ product, contractAddress, ...oth
             {name}
           </Typography>
 
-          <Typography variant="h4" sx={{ mb: 3 }}>
-            &nbsp;{price + ' CRO'}
-          </Typography>
+          {status !== 'sold' ? (
+            <Typography variant="h4" sx={{ mb: 3 }}>
+              &nbsp;{web3.utils.fromWei(price.toString(), 'ether') + ' CRO'}
+            </Typography>
+          ) : (
+            ''
+          )}
 
           <Divider sx={{ borderStyle: 'dashed' }} />
 
@@ -250,48 +251,54 @@ export default function ProductDetailsSummary({ product, contractAddress, ...oth
             </TabContext>
           </Card>
 
-          {!isMetaMaskInstalled ||
-          !isWeb3Available ||
-          typeof account !== 'string' ||
-          !marketPlaceApproved ? (
-            <Box sx={{ mt: 5 }}>
-              <Grid container spacing={2} justifyContent="center">
-                <Grid item xs={12} sm={6}>
-                  <LoadingButton
-                    disabled={
-                      (!isMetaMaskInstalled || !isWeb3Available || typeof account !== 'string') &&
-                      !marketPlaceApproved
-                    }
-                    variant="contained"
-                    color="secondary"
-                    onClick={enableNFTs}
-                    loading={pendingEnabling}
-                  >
-                    {typeof account !== 'string'
-                      ? 'Connect Metamask'
-                      : 'Enable eNFTverse NFTs on marketplace'}
-                  </LoadingButton>
+          {status !== 'sold' ? (
+            !isMetaMaskInstalled ||
+            !isWeb3Available ||
+            typeof account !== 'string' ||
+            !marketPlaceApproved ? (
+              <Box sx={{ mt: 5 }}>
+                <Grid container spacing={2} justifyContent="center">
+                  <Grid item xs={12} sm={6}>
+                    <LoadingButton
+                      fullWidth
+                      size="large"
+                      disabled={
+                        (!isMetaMaskInstalled || !isWeb3Available || typeof account !== 'string') &&
+                        !marketPlaceApproved
+                      }
+                      variant="contained"
+                      color="secondary"
+                      onClick={enableNFTs}
+                      loading={pendingEnabling}
+                    >
+                      {typeof account !== 'string'
+                        ? 'Connect Metamask'
+                        : 'Enable eNFTverse NFTs on marketplace'}
+                    </LoadingButton>
+                  </Grid>
                 </Grid>
-              </Grid>
-            </Box>
+              </Box>
+            ) : (
+              <Box sx={{ mt: 5 }}>
+                <Grid container spacing={2} justifyContent="center">
+                  <Grid item xs={12} sm={6}>
+                    <LoadingButton
+                      fullWidth
+                      size="large"
+                      type="submit"
+                      color="info"
+                      variant="contained"
+                      onClick={buyNft}
+                      loading={isBuying}
+                    >
+                      Buy Now
+                    </LoadingButton>
+                  </Grid>
+                </Grid>
+              </Box>
+            )
           ) : (
-            <Box sx={{ mt: 5 }}>
-              <Grid container spacing={2} justifyContent="center">
-                <Grid item xs={12} sm={6}>
-                  <LoadingButton
-                    fullWidth
-                    size="large"
-                    type="submit"
-                    color="info"
-                    variant="contained"
-                    onClick={buyNft}
-                    loading={isBuying}
-                  >
-                    Buy Now
-                  </LoadingButton>
-                </Grid>
-              </Grid>
-            </Box>
+            ''
           )}
         </Form>
       </FormikProvider>

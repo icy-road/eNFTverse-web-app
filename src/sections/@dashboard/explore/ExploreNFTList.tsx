@@ -1,4 +1,4 @@
-import { Nft } from '../../../@types/nft';
+import {Nft, NftCollection} from '../../../@types/nft';
 import {
   Autocomplete,
   Box,

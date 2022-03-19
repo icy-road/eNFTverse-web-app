@@ -31,20 +31,23 @@ export default function NFTCard({ nft, forListing, prepareListForSale }: Props) 
           <Typography variant="body2">{description}</Typography>
         </Stack>
       </Stack>
-      <Stack spacing={2} sx={{ p: 3 }}>
-        <Button
-          disabled={!forListing}
-          variant="contained"
-          color="secondary"
-          onClick={() => {
-            if (prepareListForSale) {
-              prepareListForSale(nft);
-            }
-          }}
-        >
-          List for Sale
-        </Button>
-      </Stack>
+      {forListing ? (
+        <Stack spacing={2} sx={{ p: 3 }}>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => {
+              if (prepareListForSale) {
+                prepareListForSale(nft);
+              }
+            }}
+          >
+            List for Sale
+          </Button>
+        </Stack>
+      ) : (
+        ''
+      )}
     </Card>
   );
 }

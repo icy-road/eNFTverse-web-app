@@ -4,6 +4,8 @@ import { Box, Card, Link, Typography, Stack } from '@mui/material';
 import { Product } from '../../../../@types/product';
 import Image from '../../../../components/Image';
 import React from 'react';
+import Web3 from "web3";
+import {WEB3_PROVIDER} from "../../../../api/config";
 
 type Props = {
   product: Product;
@@ -13,6 +15,8 @@ export default function ShopProductCard({ product }: Props) {
   const { nftId, name, description, image, price, contractAddress } = product;
 
   const linkTo = `/marketplace/nft/${paramCase(nftId)}/${contractAddress}`;
+
+  const web3 = new Web3(WEB3_PROVIDER ?? '');
 
   return (
     <Card
@@ -38,7 +42,7 @@ export default function ShopProductCard({ product }: Props) {
         <Link to={linkTo} color="inherit" component={RouterLink}>
           <Stack direction="row" alignItems="center" justifyContent="space-between">
             <Typography variant="subtitle1" color="secondary">
-              &nbsp;{price + ' CRO'}
+              &nbsp;{web3.utils.fromWei(price.toString(), 'ether') + ' CRO'}
             </Typography>
           </Stack>
         </Link>
