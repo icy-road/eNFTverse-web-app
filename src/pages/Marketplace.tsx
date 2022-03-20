@@ -62,6 +62,8 @@ export default function Marketplace() {
         setCollectionLoadState({ ...collectionLoadState });
       }
 
+      setLoadingProducts(false)
+
       for (const collection of COLLECTIONS) {
         const nftContract = new web3.eth.Contract(nftContractABI, collection.address);
 
@@ -107,10 +109,6 @@ export default function Marketplace() {
 
           collectionLoadState[collection.name].loading = false;
           setCollectionLoadState({ ...collectionLoadState });
-
-          if (tokenCount > 0) {
-            setLoadingProducts(false);
-          }
         }
       }
 
