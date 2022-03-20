@@ -273,7 +273,7 @@ export default function ProductDetailsSummary({ product, contractAddress, ...oth
                     >
                       {typeof account !== 'string'
                         ? 'Connect Metamask'
-                        : 'Enable eNFTverse NFTs on marketplace'}
+                        : 'Enable eNFTiverse NFTs on marketplace'}
                     </LoadingButton>
                   </Grid>
                 </Grid>

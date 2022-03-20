@@ -26,7 +26,7 @@ export default function Logo({ disabledLink = false, sx }: Props) {
           textDecoration: 'none',
         }}
       >
-        eNFTverse
+        eNFTiverse
       </Typography>
     </Box>
   );

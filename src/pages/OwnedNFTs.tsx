@@ -295,7 +295,7 @@ export default function OwnedNFTs() {
                       onClick={enableMarketplace}
                       loading={pendingEnabling}
                     >
-                      Enable eNFTverse NFTs on marketplace
+                      Enable eNFTiverse NFTs on marketplace
                     </LoadingButton>
                   </Box>
                 </Alert>

@@ -18,11 +18,11 @@ export default function ExploreNFTs() {
   const [nfts, setNfts] = useState<any>({});
   const [loadingNfts, setLoadingNfts] = useState(false);
 
-  const [view, setView] = useState('featured');
+  const [view, setView] = useState('Puss Coins');
 
   const handleChange = (event: any, nextView: React.SetStateAction<string>) => {
     if (!nextView) {
-      setView('featured');
+      setView('Puss Coins');
     } else {
       setView(nextView);
     }
@@ -72,7 +72,7 @@ export default function ExploreNFTs() {
     const collectionListEl: any[] = [];
 
     Object.keys(nfts).forEach((key) => {
-      if (view === 'featured' && key !== 'Public') {
+      if (view === 'Puss Coins' && key !== 'Public') {
         collectionListEl.push(
           <Box
             sx={{
@@ -89,9 +89,15 @@ export default function ExploreNFTs() {
       } else {
         if (key === view) {
           collectionListEl.push(
-            <Typography key={uuid()} variant="h5" component="h5" paragraph>
-              {key}
-            </Typography>
+            <Box
+              sx={{
+                mt: 2,
+              }}
+            >
+              <Typography key={uuid()} variant="h5" component="h5" paragraph>
+                {key}
+              </Typography>
+            </Box>
           );
 
           collectionListEl.push(<ExploreNFTList key={uuid()} nfts={nfts[key]} isDefault={false} />);
@@ -115,9 +121,6 @@ export default function ExploreNFTs() {
 
     return (
       <ToggleButtonGroup value={view} exclusive onChange={handleChange} color={'primary'}>
-        <ToggleButton value="featured" aria-label="featured">
-          Featured
-        </ToggleButton>
         {toggleButtons}
       </ToggleButtonGroup>
     );
