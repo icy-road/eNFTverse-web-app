@@ -55,7 +55,6 @@ export default function OwnedNFTs() {
   const [loadingNfts, setLoadingNfts] = useState(false);
   const [collectionLoadState, setCollectionLoadState] = useState<any>({});
 
-  const [nftList, setNftList] = useState<any>([]);
   const [nfts, setNfts] = useState<any>({});
 
   const [nftCount, setNftCount] = useState(0);
@@ -248,6 +247,8 @@ export default function OwnedNFTs() {
           setLoadingNfts(false);
         }
       }
+
+      setLoadingNfts(false);
     }
   }
 
@@ -267,6 +268,7 @@ export default function OwnedNFTs() {
       if (collectionLoadState[key] && collectionLoadState[key].balance > 0) {
         collectionListEl.push(
           <Box
+              key={uuid()}
             sx={{
               mt: 2,
             }}
@@ -280,6 +282,7 @@ export default function OwnedNFTs() {
         if (marketPlaceApproved[key] && !marketPlaceApproved[key].approved) {
           collectionListEl.push(
             <Box
+                key={uuid()}
               sx={{
                 mb: 2,
               }}
