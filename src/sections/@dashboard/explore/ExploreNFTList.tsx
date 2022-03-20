@@ -19,7 +19,7 @@ export default function ExploreNFTList({
   forListing,
   prepareListForSale,
 }: Props) {
-  const loading = !nfts.length && isDefault;
+  const loading = !nfts || !nfts.length && isDefault;
 
   return (
     <Box

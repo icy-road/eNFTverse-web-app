@@ -19,13 +19,15 @@ import useMetaMaskOnboarding from '../hooks/useMetaMaskOnboarding';
 import * as Yup from 'yup';
 
 import useENSName from '../hooks/useENSName';
-import { CONTRACT_ADDRESS, EXPLORER_URL, MARKETPLACE_ADDRESS, WEB3_PROVIDER } from '../api/config';
+import { COLLECTIONS, EXPLORER_URL, MARKETPLACE_ADDRESS, WEB3_PROVIDER } from '../api/config';
 import Web3 from 'web3';
 import { ExploreNFTList } from '../sections/@dashboard/explore';
 import { Alert, LoadingButton } from '@mui/lab';
 import { Form, FormikProvider, useFormik } from 'formik';
 import Image from '../components/Image';
 import { Nft } from '../@types/nft';
+import { uuid } from '../utils/helper';
+import { useTheme } from '@mui/material/styles';
 
 const nftContractABI = require('../utils/NFTContract.json');
 const marketplaceABI = require('../utils/marketplaceAbi.json');
@@ -33,6 +35,7 @@ const marketplaceABI = require('../utils/marketplaceAbi.json');
 const superagent = require('superagent');
 
 export default function OwnedNFTs() {
+  const theme = useTheme();
   const { themeStretch } = useSettings();
 
   const { account, library } = useWeb3React();
@@ -43,19 +46,17 @@ export default function OwnedNFTs() {
 
   const web3 = new Web3(WEB3_PROVIDER ?? '');
 
-  const nftContractAddress = CONTRACT_ADDRESS;
-
   const marketplaceAddress = MARKETPLACE_ADDRESS;
-
-  const nftContract = new web3.eth.Contract(nftContractABI, nftContractAddress);
 
   const marketPlaceContract = new web3.eth.Contract(marketplaceABI, marketplaceAddress);
 
-  const [marketPlaceApproved, setMarketPlaceApproved] = useState(true);
+  const [marketPlaceApproved, setMarketPlaceApproved] = useState<any>({});
 
   const [loadingNfts, setLoadingNfts] = useState(false);
+  const [collectionLoadState, setCollectionLoadState] = useState<any>({});
 
   const [nftList, setNftList] = useState<any>([]);
+  const [nfts, setNfts] = useState<any>({});
 
   const [nftCount, setNftCount] = useState(0);
 
@@ -84,7 +85,7 @@ export default function OwnedNFTs() {
         try {
           const listNFTForSaleAbi = await marketPlaceContract.methods
             .listNFTForSale(
-              nftContractAddress,
+              selectedNft.address,
               selectedNft.id,
               web3.utils.toWei(values.price.toString(), 'ether')
             )
@@ -111,10 +112,13 @@ export default function OwnedNFTs() {
               resetForm();
               setOpenListNftDialog(false);
 
-              const newNftArray = [...nftList];
+              const newNfts = {...nfts}
 
-              setNftList(newNftArray.filter((nft) => nft.id !== selectedNft.id));
+              const newNftArray = [...newNfts[selectedNft.collection]]
 
+              newNfts[selectedNft.collection] = newNftArray.filter((nft) => nft.id !== selectedNft.id)
+
+              setNfts(newNfts)
               setListing(false);
             })
             .catch((err: any) => {
@@ -130,8 +134,10 @@ export default function OwnedNFTs() {
 
   const { errors, touched, handleSubmit, getFieldProps, resetForm } = formik;
 
-  const enableMarketplace = async () => {
+  const enableMarketplace = async (collectionName: string, collectionAddress: string) => {
     setPendingEnabling(true);
+
+    const nftContract = new web3.eth.Contract(nftContractABI, collectionAddress);
 
     const approveForAllAbi = await nftContract.methods
       .setApprovalForAll(marketplaceAddress, true)
@@ -141,7 +147,7 @@ export default function OwnedNFTs() {
 
     const params = {
       from: metamaskAddress,
-      to: nftContractAddress,
+      to: collectionAddress,
       data: approveForAllAbi,
     };
 
@@ -159,7 +165,14 @@ export default function OwnedNFTs() {
         window.open(`${EXPLORER_URL}/tx/${txHash}/`);
 
         setPendingEnabling(false);
-        setMarketPlaceApproved(true);
+        const updateMarketplaceApproval = { ...marketPlaceApproved };
+
+        updateMarketplaceApproval[collectionName] = {
+          address: collectionAddress,
+          approved: true,
+        };
+
+        setMarketPlaceApproved(updateMarketplaceApproval);
       })
       .catch((err: any) => {
         console.log(err);
@@ -170,36 +183,71 @@ export default function OwnedNFTs() {
   async function checkIfMarketplaceEnabled() {
     if (account) {
       setLoadingNfts(true);
-      const fetchedNfts = [];
+      const nftMap: any = {};
+      const approvalMap: any = {};
+      const collectionLoadState: any = {};
+
       const metamaskAddress = ENSName || account ? account : null;
 
-      const isApprovedResponse = await nftContract.methods
-        .isApprovedForAll(metamaskAddress, marketplaceAddress)
-        .call();
+      for (const collection of COLLECTIONS) {
+        const nftContract = new web3.eth.Contract(nftContractABI, collection.address);
 
-      setMarketPlaceApproved(isApprovedResponse);
+        const isApprovedResponse = await nftContract.methods
+          .isApprovedForAll(metamaskAddress, marketplaceAddress)
+          .call();
 
-      const balanceNfts = await nftContract.methods.balanceOf(metamaskAddress).call();
+        approvalMap[collection.name] = {
+          address: collection.address,
+          approved: isApprovedResponse,
+        };
 
-      setNftCount(Number(balanceNfts));
+        setMarketPlaceApproved({ ...approvalMap });
 
-      for (let index = 0; index < balanceNfts; index++) {
-        const nftId = await nftContract.methods.tokenOfOwnerByIndex(metamaskAddress, index).call();
+        const balanceNfts = await nftContract.methods.balanceOf(metamaskAddress).call();
 
-        const nftAddress = await nftContract.methods.tokenURI(nftId).call();
+        collectionLoadState[collection.name] = {
+          loading: true,
+          balance: Number(balanceNfts),
+        };
 
-        const nftMetadata: any = (await superagent.get(nftAddress)).body;
-        fetchedNfts.push({
-          id: nftId,
-          image: nftMetadata.image,
-          name: nftMetadata.name,
-          description: nftMetadata.description,
-          category: 'Art',
+        setCollectionLoadState(collectionLoadState);
+        setNftCount((prevState) => {
+          return prevState + Number(balanceNfts);
         });
-      }
 
-      setNftList(fetchedNfts);
-      setLoadingNfts(false);
+        for (let index = 0; index < balanceNfts; index++) {
+          const nftId = await nftContract.methods
+            .tokenOfOwnerByIndex(metamaskAddress, index)
+            .call();
+
+          const nftAddress = await nftContract.methods.tokenURI(nftId).call();
+
+          const nftMetadata: any = (await superagent.get(nftAddress)).body;
+
+          const nftList: Nft[] | any = nftMap[collection.name] ? [...nftMap[collection.name]] : [];
+
+          nftList.push({
+            id: nftId,
+            address: collection.address,
+            collection: collection.name,
+            image: nftMetadata.image,
+            name: nftMetadata.name,
+            description: nftMetadata.description,
+            category: 'Art',
+          });
+
+          nftMap[collection.name] = [...nftList];
+        }
+
+        collectionLoadState[collection.name].loading = false;
+        setCollectionLoadState({ ...collectionLoadState });
+
+        setNfts({ ...nftMap });
+
+        if (balanceNfts > 0) {
+          setLoadingNfts(false);
+        }
+      }
     }
   }
 
@@ -212,8 +260,93 @@ export default function OwnedNFTs() {
     setOpenListNftDialog(true);
   }
 
-  console.log(
-      nftCount)
+  const renderNfts = () => {
+    const collectionListEl: any[] = [];
+
+    Object.keys(collectionLoadState).forEach((key) => {
+      if (collectionLoadState[key] && collectionLoadState[key].balance > 0) {
+        collectionListEl.push(
+          <Box
+            sx={{
+              mt: 2,
+            }}
+          >
+            <Typography key={uuid()} variant="h5" component="h5" paragraph>
+              {key}
+            </Typography>
+          </Box>
+        );
+
+        if (marketPlaceApproved[key] && !marketPlaceApproved[key].approved) {
+          collectionListEl.push(
+            <Box
+              sx={{
+                mb: 2,
+              }}
+            >
+              <Alert
+                severity="warning"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    [theme.breakpoints.down('sm')]: { flexDirection: 'column' },
+                  }}
+                >
+                  <Typography>{`Please enable ${key} on marketplace in order to list NFTs.`}</Typography>
+                  <LoadingButton
+                    sx={{
+                      ml: 1,
+                    }}
+                    disabled={!isMetaMaskInstalled || !isWeb3Available}
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => {
+                      enableMarketplace(key, marketPlaceApproved[key].address);
+                    }}
+                    loading={pendingEnabling}
+                  >
+                    Enable marketplace
+                  </LoadingButton>
+                </Box>
+              </Alert>
+            </Box>
+          );
+        }
+
+        if (collectionLoadState[key] && !collectionLoadState[key].loading) {
+          collectionListEl.push(
+            <ExploreNFTList
+              key={uuid()}
+              forListing={marketPlaceApproved[key] ? marketPlaceApproved[key].approved : false}
+              loadingCount={4}
+              nfts={nfts[key]}
+              prepareListForSale={prepareListForSale}
+              isDefault={false}
+            />
+          );
+        } else {
+          collectionListEl.push(
+            <ExploreNFTList
+              key={uuid()}
+              forListing={false}
+              loadingCount={collectionLoadState[key].balance ?? 5}
+              isDefault={true}
+              nfts={[]}
+            />
+          );
+        }
+      }
+    });
+
+    return <Box>{collectionListEl}</Box>;
+  };
 
   return (
     <Page title="Owned NFTs">
@@ -257,55 +390,7 @@ export default function OwnedNFTs() {
             <ExploreNFTList forListing={false} loadingCount={4} isDefault={true} nfts={[]} />
           </Box>
         ) : (
-          <Box>
-            {!marketPlaceApproved ? (
-              <Box
-                sx={{
-                  mb: 1,
-                }}
-              >
-                <Alert
-                  severity="warning"
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <Typography>
-                      Please enable marketplace in order to list NFTs for sale.
-                    </Typography>
-                    <LoadingButton
-                      sx={{
-                        ml: 1,
-                      }}
-                      disabled={(!isMetaMaskInstalled || !isWeb3Available) && !marketPlaceApproved}
-                      variant="contained"
-                      color="secondary"
-                      onClick={enableMarketplace}
-                      loading={pendingEnabling}
-                    >
-                      Enable eNFTiverse NFTs on marketplace
-                    </LoadingButton>
-                  </Box>
-                </Alert>
-              </Box>
-            ) : (
-              ''
-            )}
-            <ExploreNFTList
-              forListing={marketPlaceApproved}
-              loadingCount={4}
-              isDefault={true}
-              prepareListForSale={prepareListForSale}
-              nfts={nftList}
-            />
-          </Box>
+          renderNfts()
         )}
         <Dialog
           fullWidth={true}

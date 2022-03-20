@@ -19,7 +19,7 @@ export default function NFTCard({ nft, forListing, prepareListForSale }: Props) 
       }}
     >
       <Box sx={{ position: 'relative' }}>
-        <Image alt={name} src={image} ratio="1/1" />
+        <Image alt={name} src={image} ratio="1/1" disabledEffect={true} />
       </Box>
 
       <Stack spacing={2} sx={{ p: 3 }}>

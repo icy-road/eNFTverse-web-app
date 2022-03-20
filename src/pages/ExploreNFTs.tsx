@@ -47,6 +47,7 @@ export default function ExploreNFTs() {
           const nftList: Nft[] | any = nftMap[collection.name] ? [...nftMap[collection.name]] : [];
 
           nftList.push({
+            collection: collection.name,
             image: nftMetadata.image,
             name: nftMetadata.name,
             description: nftMetadata.description,

@@ -21,7 +21,7 @@ import { generateIPFSMetadataHash } from '../api/ApiClient';
 import { useWeb3React } from '@web3-react/core';
 import { Web3Provider } from '@ethersproject/providers';
 import Web3 from 'web3';
-import { CONTRACT_ADDRESS, EXPLORER_URL, WEB3_PROVIDER } from '../api/config';
+import {COLLECTIONS, CONTRACT_ADDRESS, EXPLORER_URL, WEB3_PROVIDER} from '../api/config';
 
 type Props = {
   openCreateNftDialog: boolean;
@@ -40,7 +40,7 @@ export default function CreateNFTDialog({
 }: Props) {
   const web3 = new Web3(WEB3_PROVIDER ?? '');
 
-  const nftContractAddress = CONTRACT_ADDRESS;
+  const nftContractAddress = COLLECTIONS[0].address;
 
   const nftContract = new web3.eth.Contract(nftContractABI, nftContractAddress);
 
