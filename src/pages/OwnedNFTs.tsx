@@ -2,19 +2,14 @@ import useSettings from '../hooks/useSettings';
 import Page from '../components/Page';
 import React, { useEffect, useState } from 'react';
 import {
-  Autocomplete,
   Backdrop,
   Box,
   Button,
-  Chip,
   CircularProgress,
   Container,
   Dialog,
   DialogContent,
   DialogTitle,
-  Divider,
-  getTableSortLabelUtilityClass,
-  Snackbar,
   Stack,
   TextField,
   Typography,
@@ -99,7 +94,7 @@ export default function OwnedNFTs() {
             to: marketplaceAddress,
             data: listNFTForSaleAbi,
           };
-          const gasPrice = await library.estimateGas(params);
+          await library.estimateGas(params);
 
           // @ts-ignore
           await window.ethereum.enable();
@@ -133,7 +128,7 @@ export default function OwnedNFTs() {
     },
   });
 
-  const { errors, values, touched, handleSubmit, setFieldValue, getFieldProps, resetForm } = formik;
+  const { errors, touched, handleSubmit, getFieldProps, resetForm } = formik;
 
   const enableMarketplace = async () => {
     setPendingEnabling(true);
@@ -150,7 +145,7 @@ export default function OwnedNFTs() {
       data: approveForAllAbi,
     };
 
-    const gasPrice = await library.estimateGas(params);
+    await library.estimateGas(params);
 
     // @ts-ignore
     await window.ethereum.enable();
@@ -250,7 +245,7 @@ export default function OwnedNFTs() {
                 <CircularProgress />
               ) : (
                 <Typography variant="h5" component="h5" paragraph>
-                  {nftCount == 0 &&
+                  {nftCount === 0 &&
                   isMetaMaskInstalled &&
                   isWeb3Available &&
                   typeof account === 'string'

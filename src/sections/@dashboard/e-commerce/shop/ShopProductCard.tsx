@@ -4,8 +4,8 @@ import { Box, Card, Link, Typography, Stack } from '@mui/material';
 import { Product } from '../../../../@types/product';
 import Image from '../../../../components/Image';
 import React from 'react';
-import Web3 from "web3";
-import {WEB3_PROVIDER} from "../../../../api/config";
+import Web3 from 'web3';
+import { WEB3_PROVIDER } from '../../../../api/config';
 
 type Props = {
   product: Product;

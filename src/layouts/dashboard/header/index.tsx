@@ -1,30 +1,18 @@
-// @mui
 import { styled } from '@mui/material/styles';
 import { Box, Stack, AppBar, Toolbar } from '@mui/material';
-// hooks
 import useOffSetTop from '../../../hooks/useOffSetTop';
 import useResponsive from '../../../hooks/useResponsive';
 import useCollapseDrawer from '../../../hooks/useCollapseDrawer';
-// utils
 import cssStyles from '../../../utils/cssStyles';
-// config
 import {
   DASHBOARD_NAVBAR_WIDTH,
   DASHBOARD_HEADER_MOBILE,
   DASHBOARD_HEADER_DESKTOP,
   DASHBOARD_NAVBAR_COLLAPSE_WIDTH,
 } from '../../../config';
-// components
 import Iconify from '../../../components/Iconify';
 import { IconButtonAnimate } from '../../../components/animate';
-//
-import Searchbar from './Searchbar';
 import AccountPopover from './AccountPopover';
-import LanguagePopover from './LanguagePopover';
-import ContactsPopover from './ContactsPopover';
-import NotificationsPopover from './NotificationsPopover';
-
-// ----------------------------------------------------------------------
 
 type RootStyleProps = {
   isCollapse: boolean | undefined;

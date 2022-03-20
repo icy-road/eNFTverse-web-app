@@ -11,7 +11,7 @@ import { shortenHex } from '../../../utils/helper';
 export default function AccountPopover() {
   const anchorRef = useRef(null);
 
-  const { active, error, activate, chainId, account, setError } = useWeb3React();
+  const { active, error, activate, account, setError } = useWeb3React();
 
   const {
     isMetaMaskInstalled,
@@ -32,10 +32,6 @@ export default function AccountPopover() {
 
   const handleOpen = () => {
     setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
   };
 
   const handleConnectWallet = () => {

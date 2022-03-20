@@ -16,12 +16,12 @@ import { useTheme } from '@mui/material/styles';
 import { Form, FormikProvider, useFormik } from 'formik';
 import * as Yup from 'yup';
 import { Alert, LoadingButton } from '@mui/lab';
-import UploadSingleFile, { CustomFile } from './UploadSingleFile';
+import UploadSingleFile from './UploadSingleFile';
 import { generateIPFSMetadataHash } from '../api/ApiClient';
 import { useWeb3React } from '@web3-react/core';
 import { Web3Provider } from '@ethersproject/providers';
 import Web3 from 'web3';
-import {CONTRACT_ADDRESS, EXPLORER_URL, WEB3_PROVIDER} from "../api/config";
+import { CONTRACT_ADDRESS, EXPLORER_URL, WEB3_PROVIDER } from '../api/config';
 
 type Props = {
   openCreateNftDialog: boolean;
@@ -68,7 +68,6 @@ export default function CreateNFTDialog({
     onSubmit: async (values, { setSubmitting, resetForm, setErrors }) => {
       if (library) {
         generateIPFSMetadataHash(values).then(async ({ data }) => {
-
           setSubmitting(true);
           setMinting(true);
           const sender = metamaskAddress;
@@ -82,7 +81,7 @@ export default function CreateNFTDialog({
             to: nftContractAddress,
             data: mintToEncodedAbi,
           };
-          const gasPrice = await library.estimateGas(params);
+          await library.estimateGas(params);
 
           // @ts-ignore
           await window.ethereum.enable();

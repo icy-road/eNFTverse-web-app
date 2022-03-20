@@ -1,7 +1,7 @@
-import { Nft } from '../../../@types/nft';
-import { Box, Button, Card, Link, Stack, Typography } from '@mui/material';
-import Image from '../../../components/Image';
 import React from 'react';
+import { Nft } from '../../../@types/nft';
+import { Box, Button, Card, Stack, Typography } from '@mui/material';
+import Image from '../../../components/Image';
 
 type Props = {
   nft: Nft;

@@ -4,12 +4,11 @@ import { useParams } from 'react-router-dom';
 
 import useSettings from '../hooks/useSettings';
 import Page from '../components/Page';
-import { Box, Card, CircularProgress, Container, Grid, Skeleton, Typography } from '@mui/material';
-import SkeletonNft from '../components/skeleton/SkeletonNft';
+import { Box, Card, CircularProgress, Container, Grid, Typography } from '@mui/material';
 import Image from '../components/Image';
 import ProductDetailsSummary from 'src/sections/@dashboard/e-commerce/product/ProductDetailsSummary';
 import { Product } from '../@types/product';
-import {CONTRACT_ADDRESS, EXPLORER_URL, MARKETPLACE_ADDRESS, WEB3_PROVIDER} from '../api/config';
+import { CONTRACT_ADDRESS, MARKETPLACE_ADDRESS, WEB3_PROVIDER } from '../api/config';
 import Web3 from 'web3';
 
 const nftContractABI = require('../utils/NFTContract.json');
@@ -35,10 +34,8 @@ export default function NFTDetails() {
       const nftMetadata: any = (await superagent.get(nftAddress)).body;
 
       const marketPlaceItem = await marketPlaceContract.methods
-          .getMarketplaceItemByNFT(contractAddress, id)
-          .call();
-
-      console.log(marketPlaceItem)
+        .getMarketplaceItemByNFT(contractAddress, id)
+        .call();
 
       setProduct({
         nftId: id,
@@ -48,7 +45,7 @@ export default function NFTDetails() {
         name: nftMetadata.name,
         price: marketPlaceItem.price,
         priceSale: null,
-        status: marketPlaceItem.price >0 ? 'sale' : 'sold',
+        status: marketPlaceItem.price > 0 ? 'sale' : 'sold',
         description: nftMetadata.description,
         category: 'Art',
       });

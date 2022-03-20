@@ -5,7 +5,7 @@ import { Box, Theme, Typography, Paper, SxProps } from '@mui/material';
 // assets
 //
 import Image from './Image';
-import {UploadIllustration} from "../assets";
+import { UploadIllustration } from '../assets';
 
 // ----------------------------------------------------------------------
 

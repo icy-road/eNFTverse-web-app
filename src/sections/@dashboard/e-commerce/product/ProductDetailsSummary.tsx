@@ -1,8 +1,7 @@
-import { useFormik, Form, FormikProvider, useField } from 'formik';
+import { useFormik, Form, FormikProvider } from 'formik';
 import { styled } from '@mui/material/styles';
-import { Box, Grid, Button, Divider, IconButton, Typography, Card, Tab, Link } from '@mui/material';
+import { Box, Grid, Divider, Typography, Card, Tab, Link } from '@mui/material';
 import { Product } from '../../../../@types/product';
-import Iconify from '../../../../components/Iconify';
 import React, { useEffect, useState } from 'react';
 import Markdown from '../../../../components/Markdown';
 import { LoadingButton, TabContext, TabList, TabPanel } from '@mui/lab';
@@ -20,8 +19,6 @@ const RootStyle = styled('div')(({ theme }) => ({
   },
 }));
 
-// ----------------------------------------------------------------------
-
 type Props = {
   product: Product;
   contractAddress?: string;
@@ -29,8 +26,6 @@ type Props = {
 
 const nftContractABI = require('../../../../utils/NFTContract.json');
 const marketplaceABI = require('../../../../utils/marketplaceAbi.json');
-
-const superagent = require('superagent');
 
 export default function ProductDetailsSummary({ product, contractAddress, ...other }: Props) {
   const navigate = useNavigate();
@@ -86,7 +81,7 @@ export default function ProductDetailsSummary({ product, contractAddress, ...oth
       data: buyNftAbi,
       value: price,
     };
-    const gasPrice = await library.estimateGas(params);
+    await library.estimateGas(params);
 
     // @ts-ignore
     await window.ethereum.enable();
@@ -124,7 +119,7 @@ export default function ProductDetailsSummary({ product, contractAddress, ...oth
       data: approveForAllAbi,
     };
 
-    const gasPrice = await library.estimateGas(params);
+    await library.estimateGas(params);
 
     // @ts-ignore
     await window.ethereum.enable();
@@ -303,63 +298,5 @@ export default function ProductDetailsSummary({ product, contractAddress, ...oth
         </Form>
       </FormikProvider>
     </RootStyle>
-  );
-}
-
-// ----------------------------------------------------------------------
-
-type IncrementerProps = {
-  name: string;
-  available: number;
-};
-
-function Incrementer({ name, available }: IncrementerProps) {
-  const [field, , helpers] = useField(name);
-  const { value } = field;
-  const { setValue } = helpers;
-
-  const incrementQuantity = () => {
-    setValue(value + 1);
-  };
-  const decrementQuantity = () => {
-    setValue(value - 1);
-  };
-
-  return (
-    <Box
-      sx={{
-        py: 0.5,
-        px: 0.75,
-        border: 1,
-        lineHeight: 0,
-        borderRadius: 1,
-        display: 'flex',
-        alignItems: 'center',
-        borderColor: 'grey.50032',
-      }}
-    >
-      <IconButton size="small" color="inherit" disabled={value <= 1} onClick={decrementQuantity}>
-        <Iconify icon={'eva:minus-fill'} width={16} height={16} />
-      </IconButton>
-      <Typography
-        variant="body2"
-        component="span"
-        sx={{
-          width: 40,
-          textAlign: 'center',
-          display: 'inline-block',
-        }}
-      >
-        {value}
-      </Typography>
-      <IconButton
-        size="small"
-        color="inherit"
-        disabled={value >= available}
-        onClick={incrementQuantity}
-      >
-        <Iconify icon={'eva:plus-fill'} width={16} height={16} />
-      </IconButton>
-    </Box>
   );
 }

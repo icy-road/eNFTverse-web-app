@@ -1,4 +1,4 @@
-import {NftCollection} from "../@types/nft";
+import { NftCollection } from '../@types/nft';
 
 export const API_URL = process.env.REACT_APP_API_URL;
 
@@ -6,7 +6,7 @@ export const EXPLORER_URL = process.env.REACT_APP_EXPLORER_URL;
 
 export const CONTRACT_ADDRESS = process.env.REACT_APP_CONTRACT_ADDRESS;
 
-export const COLLECTIONS : NftCollection[] = [
+export const COLLECTIONS: NftCollection[] = [
   {
     name: 'Puss Coins',
     address: process.env.REACT_APP_PUSS_CONTRACT_ADDRESS,

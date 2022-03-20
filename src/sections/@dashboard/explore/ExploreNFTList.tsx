@@ -1,23 +1,8 @@
-import {Nft, NftCollection} from '../../../@types/nft';
-import {
-  Autocomplete,
-  Box,
-  Button,
-  Chip,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Snackbar,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Nft } from '../../../@types/nft';
+import { Box } from '@mui/material';
 import SkeletonProductItem from '../../../components/skeleton/SkeletonProductItem';
 import { NFTCard } from './index';
 import React from 'react';
-import { Alert, LoadingButton } from '@mui/lab';
-import { Form, FormikProvider } from 'formik';
-import UploadSingleFile from '../../../components/UploadSingleFile';
 
 type Props = {
   nfts: Nft[];

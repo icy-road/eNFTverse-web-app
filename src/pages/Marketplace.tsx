@@ -7,10 +7,8 @@ import Page from '../components/Page';
 import { ShopProductList } from '../sections/@dashboard/e-commerce/shop';
 import { Product } from '../@types/product';
 import { useWeb3React } from '@web3-react/core';
-import useMetaMaskOnboarding from '../hooks/useMetaMaskOnboarding';
 import Web3 from 'web3';
-import useENSName from '../hooks/useENSName';
-import { CONTRACT_ADDRESS, EXPLORER_URL, MARKETPLACE_ADDRESS, WEB3_PROVIDER } from '../api/config';
+import { CONTRACT_ADDRESS, MARKETPLACE_ADDRESS, WEB3_PROVIDER } from '../api/config';
 
 const nftContractABI = require('../utils/NFTContract.json');
 const marketplaceABI = require('../utils/marketplaceAbi.json');
@@ -22,11 +20,9 @@ export default function Marketplace() {
 
   const web3 = new Web3(WEB3_PROVIDER ?? '');
 
-  const { account, library } = useWeb3React();
+  const { account } = useWeb3React();
 
   const [products, setProducts] = useState<Product[]>([]);
-
-  const ENSName = useENSName(account);
 
   const nftContractAddress = CONTRACT_ADDRESS;
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Container, Typography } from '@mui/material';
+import { Box, Container, Typography, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import Page from '../components/Page';
 import useSettings from '../hooks/useSettings';
 import Web3 from 'web3';
@@ -7,7 +7,6 @@ import { Nft } from '../@types/nft';
 import { ExploreNFTList } from '../sections/@dashboard/explore';
 import { COLLECTIONS, WEB3_PROVIDER } from '../api/config';
 import { uuid } from '../utils/helper';
-import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 
 const nftContractABI = require('../utils/NFTContract.json');
 const superagent = require('superagent');

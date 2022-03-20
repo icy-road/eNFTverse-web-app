@@ -25,8 +25,8 @@ export default function Router() {
         { path: '/marketplace', element: <Marketplace /> },
         { path: '/', element: <Navigate to="/marketplace" replace /> },
         { path: '/marketplace/nft/:id/:contractAddress', element: <ProductDetails /> },
-        { path: '/explore-nfts', element: <ExploreNFTs />},
-        { path: '/owned', element: <OwnedNFTs />}
+        { path: '/explore-nfts', element: <ExploreNFTs /> },
+        { path: '/owned', element: <OwnedNFTs /> },
       ],
     },
     {
