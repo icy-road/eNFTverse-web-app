@@ -11,6 +11,8 @@ import Web3 from 'web3';
 import { EXPLORER_URL, MARKETPLACE_ADDRESS, WEB3_PROVIDER } from '../../../../api/config';
 import useENSName from '../../../../hooks/useENSName';
 import { useNavigate } from 'react-router-dom';
+import {injected} from "../../../../connectors";
+import {UserRejectedRequestError} from "@web3-react/injected-connector";
 
 const RootStyle = styled('div')(({ theme }) => ({
   padding: theme.spacing(3),
@@ -31,9 +33,10 @@ export default function ProductDetailsSummary({ product, contractAddress, ...oth
   const navigate = useNavigate();
   const { nftId, name, price, status } = product;
 
-  const { account, library } = useWeb3React();
+  const { account, library, activate } = useWeb3React();
 
   const { isMetaMaskInstalled, isWeb3Available } = useMetaMaskOnboarding();
+  const [connecting, setConnecting] = useState(false);
   const [marketPlaceApproved, setMarketPlaceApproved] = useState(false);
   const [pendingEnabling, setPendingEnabling] = useState(false);
   const [isBuying, setIsBuying] = useState(false);
@@ -102,6 +105,21 @@ export default function ProductDetailsSummary({ product, contractAddress, ...oth
         console.log(err);
         setIsBuying(false);
       });
+  };
+
+  const handleConnectWallet = () => {
+    setConnecting(true);
+
+    activate(injected, undefined, true).then(resp => {
+      setConnecting(false);
+    }).catch((error) => {
+      // ignore the error if it's a user rejected request
+      if (error instanceof UserRejectedRequestError) {
+        setConnecting(false);
+      } else {
+        setConnecting(false)
+      }
+    });
   };
 
   const enableNFTs = async () => {
@@ -257,14 +275,11 @@ export default function ProductDetailsSummary({ product, contractAddress, ...oth
                     <LoadingButton
                       fullWidth
                       size="large"
-                      disabled={
-                        (!isMetaMaskInstalled || !isWeb3Available || typeof account !== 'string') &&
-                        !marketPlaceApproved
-                      }
                       variant="contained"
                       color="secondary"
-                      onClick={enableNFTs}
-                      loading={pendingEnabling}
+                      onClick={typeof account !== 'string' ? handleConnectWallet : enableNFTs}
+                      disabled={!isMetaMaskInstalled || !isWeb3Available}
+                      loading={pendingEnabling || connecting}
                     >
                       {typeof account !== 'string'
                         ? 'Connect Metamask'

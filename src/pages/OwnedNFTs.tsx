@@ -352,10 +352,10 @@ export default function OwnedNFTs() {
   };
 
   return (
-    <Page title="Owned NFTs">
+    <Page title="My NFTs">
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <Typography variant="h3" component="h1" paragraph>
-          Owned NFTs
+          My NFTs
         </Typography>
         {!isMetaMaskInstalled ||
         !isWeb3Available ||
@@ -386,7 +386,7 @@ export default function OwnedNFTs() {
                   isWeb3Available &&
                   typeof account === 'string'
                     ? 'No NFTs'
-                    : 'Please connect metamask to see your minted NFTs.'}
+                    : 'Please connect metamask to see your NFTs.'}
                 </Typography>
               )}
             </Backdrop>
@@ -458,9 +458,10 @@ export default function OwnedNFTs() {
                       fullWidth
                       variant="contained"
                       size="large"
+                      disabled={formik.values.price <= 0}
                       loading={listing}
                     >
-                      {'Set for Sale'}
+                      {'List for Sale'}
                     </LoadingButton>
                   </Stack>
                 </Stack>

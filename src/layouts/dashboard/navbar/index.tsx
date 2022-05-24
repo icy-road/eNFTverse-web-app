@@ -15,6 +15,9 @@ import { useWeb3React } from '@web3-react/core';
 import useMetaMaskOnboarding from '../../../hooks/useMetaMaskOnboarding';
 import CreateNFTDialog from '../../../components/CreateNFTDialog';
 import useENSName from '../../../hooks/useENSName';
+import { injected } from '../../../connectors';
+import { UserRejectedRequestError } from '@web3-react/injected-connector';
+import {LoadingButton} from "@mui/lab";
 
 const RootStyle = styled('div')(({ theme }) => ({
   [theme.breakpoints.up('lg')]: {
@@ -37,7 +40,7 @@ export default function DashboardNavbar({ isOpenSidebar, onCloseSidebar }: Props
 
   const { pathname } = useLocation();
 
-  const { account } = useWeb3React();
+  const { account, activate } = useWeb3React();
 
   const { isMetaMaskInstalled, isWeb3Available } = useMetaMaskOnboarding();
 
@@ -46,13 +49,28 @@ export default function DashboardNavbar({ isOpenSidebar, onCloseSidebar }: Props
   const { isCollapse, collapseClick, collapseHover, onHoverEnter, onHoverLeave } =
     useCollapseDrawer();
 
+  const [connecting, setConnecting] = useState(false);
   const [openCreateNftDialog, setOpenCreateNftDialog] = useState(false);
   const [metamaskAddress, setMetamaskAddress] = useState<any>('');
 
   const ENSName = useENSName(account);
 
+  const handleConnectWallet = () => {
+    setConnecting(true);
 
-    useEffect(() => {
+    activate(injected, undefined, true).then(resp => {
+      setConnecting(false);
+    }).catch((error) => {
+      // ignore the error if it's a user rejected request
+      if (error instanceof UserRejectedRequestError) {
+        setConnecting(false);
+      } else {
+        setConnecting(false)
+      }
+    });
+  };
+
+  useEffect(() => {
     if (isOpenSidebar) {
       onCloseSidebar();
     }
@@ -92,18 +110,23 @@ export default function DashboardNavbar({ isOpenSidebar, onCloseSidebar }: Props
       <Box sx={{ flexGrow: 1 }} />
 
       <Stack sx={{ m: 2, flexGrow: 1 }} justifyContent="flex-end">
-        <Button
-          disabled={!isMetaMaskInstalled || !isWeb3Available || typeof account !== 'string'}
+        <LoadingButton
+          disabled={!isMetaMaskInstalled || !isWeb3Available}
           variant="contained"
           color="secondary"
+          loading={connecting}
           onClick={() => {
-            setOpenCreateNftDialog(true);
+            if (typeof account !== 'string') {
+              handleConnectWallet();
+            } else {
+              setOpenCreateNftDialog(true);
+            }
           }}
         >
           {!isMetaMaskInstalled || !isWeb3Available || typeof account !== 'string'
             ? 'Connect Wallet to create NFT'
             : 'Create NFT'}
-        </Button>
+        </LoadingButton>
       </Stack>
     </Scrollbar>
   );

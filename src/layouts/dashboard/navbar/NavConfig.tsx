@@ -23,7 +23,7 @@ const sidebarConfig = [
     subheader: '',
     items: [
       { title: 'Marketplace', path: '/marketplace', icon: ICONS.ecommerce },
-      { title: 'Owned NFTs', path: '/owned', icon: ICONS.wallet },
+      { title: 'My NFTs', path: '/owned', icon: ICONS.wallet },
       { title: 'Explore', path: '/explore-nfts', icon: ICONS.search },
     ],
   },
